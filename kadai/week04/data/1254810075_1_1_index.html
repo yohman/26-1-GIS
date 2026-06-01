@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link href='https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css' rel='stylesheet' />
+    <script src='https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js'></script>
+    <style>
+        body { margin: 0; display: flex; height: 100vh; overflow: hidden; font-family: sans-serif; }
+        
+        #sidebar { 
+            width: 300px; 
+            flex-shrink: 0; 
+            display: flex;
+            flex-direction: column;
+            background: #f4f4f4; 
+            box-sizing: border-box;
+            user-select: none;
+        }
+        #sidebar.collapsed {
+            width: 0 !important;
+            overflow: hidden;
+        }
+
+        .sidebar-content {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        #resizer { 
+            width: 5px; 
+            background: #ccc; 
+            cursor: col-resize; 
+            flex-shrink: 0; 
+            transition: background 0.2s;
+        }
+        #resizer:hover, #resizer:active { background: #999; }
+        #resizer.hidden { display: none !important; }
+        
+        #map-container {
+            flex: 1;
+            position: relative;
+        }
+        #map { width: 100%; height: 100%; }
+
+        /* ★ここの数値を変更することで、自由に色を変えられます！ */
+        .app-floating-title {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: #2c3e50;       /*【背景色】ここを好きな色に変更できます */
+            color: #ffffff;            /*【文字色】ここを好きな色に変更できます */
+            padding: 10px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 30px;       /*角の丸み（0にすると綺麗な四角になります）*/
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .map-btn {
+            position: absolute;
+            left: 10px;
+            z-index: 10;
+            padding: 8px 14px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .map-btn:hover { background: #f0f0f0; }
+        #toggle-sidebar-btn { top: 10px; }
+        #fast-map-btn { top: 50px; }
+
+        .control-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .loc-item { 
+            cursor: pointer; 
+            padding: 10px; 
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .loc-item:hover { background: #e0e0e0; }
+        .loc-name { flex: 1; }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none; 
+        }
+        .delete-btn:hover { background: #c0392b; }
+        .delete-mode .delete-btn { display: block; } 
+
+        .maplibregl-popup-content {
+            font-size: 14px;
+            text-align: center;
+            padding: 10px 15px;
+        }
+
+        .edit-controls {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none; 
+        }
+        .edit-controls.active { display: block; }
+        .edit-btn-group { display: flex; gap: 5px; margin-top: 5px; }
+        .edit-btn-group button { flex: 1; padding: 5px; cursor: pointer; }
+        
+        #add-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #add-modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 250px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { margin-top: 0; text-align: center; }
+        .modal-content input {
+            width: 100%; box-sizing: border-box;
+            margin-bottom: 10px; padding: 8px;
+        }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 8px; cursor: pointer; }
+    </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810075</div>
+        <div style="font-size:12px;margin-bottom:3px;">石引　響</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/24 23:13</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/zV61Q6xpgVvGWO98" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810059_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810124_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+<div id="sidebar">
+    <div class="sidebar-content">
+        <div class="control-section">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <input type="checkbox" id="toggle-markers-chk" checked>
+                全てのピンを表示する
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                <input type="checkbox" id="toggle-popups-chk">
+                全てのポップアップを表示する
+            </label>
+
+            <button id="toggle-edit-btn" style="width: 100%; margin-top: 15px; padding: 6px; cursor: pointer;">
+                ⚙️ 編集メニューを開く
+            </button>
+            
+            <div id="edit-controls" class="edit-controls">
+                <div style="font-size: 12px; text-align: center; margin-bottom: 5px;">リストの編集</div>
+                <div class="edit-btn-group">
+                    <button id="show-add-modal-btn">➕ 追加</button>
+                    <button id="toggle-delete-mode-btn">🗑️ 削除モード</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="location-list"></div>
+    </div>
+</div>
+<div id="resizer"></div>
+
+<div id="map-container">
+    <div class="app-floating-title">世界英雄・偉人マップ</div>
+    
+    <button id="toggle-sidebar-btn" class="map-btn">リストを閉じる</button>
+    <button id="fast-map-btn" class="map-btn">初期位置に戻る</button>
+    <div id="map"></div>
+</div>
+
+<div id="add-modal">
+    <div class="modal-content">
+        <h3>新しい場所を追加</h3>
+        <input type="text" id="add-name" placeholder="名前 (例: 織田信長)">
+        <input type="text" id="add-lng" placeholder="経度 (例: 136.9)">
+        <input type="text" id="add-lat" placeholder="緯度 (例: 35.1)">
+        <div class="modal-buttons">
+            <button id="submit-add-btn" style="background: #27ae60; color: white; border: none;">追加する</button>
+            <button id="cancel-add-btn" style="background: #ccc; border: none;">キャンセル</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const initialCenter = [138.25, 36.20];
+    const initialZoom = 2;
+
+    const map = new maplibregl.Map({
+        container: 'map', 
+        style: 'https://demotiles.maplibre.org/style.json',
+        center: initialCenter,
+        zoom: initialZoom,
+        bearing: 0, 
+        pitch: 0    
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    const initialLocations = [
+        { lng: 21.43, lat: 41.60, name: "アレキサンダー大王"},
+        { lng: -6.41, lat: 53.88, name: "クー・フーリン" },
+        { lng: -74.23, lat: 40.78, name: "T・エジソン" },
+        { lng: -71.40, lat: 41.83, name: "H.P.ラヴクラフト" },
+        { lng: 86.93, lat: 25.26, name: "カルナ" },
+        { lng: 2.31, lat: 48.86, name: "ナポレオン" },
+        { lng: 7.10, lat: 50.74, name: "ベートーヴェン" },
+        { lng: 22.31, lat: 38.74, name: "ヘラクレス" },
+        { lng: 3.97, lat: 47.86, name: "シュヴェリエ・デオン" },
+        { lng: 24.64, lat: 45.35, name: "ヴラド・ツェペシュ" },
+        { lng: 1.09, lat: 49.44, name: "ジャンヌ・ダルク" },
+        { lng: 2.32, lat: 48.87, name: "シャルル=アンリ・サンソン" },
+        { lng: -0.73, lat: 51.11, name: "アーサー・コナン・ドイル" },
+        { lng: 29.885, lat: 31.209, name: "クレオパトラ" },
+        { lng: 109.213, lat: 34.364, name: "楊貴妃" },
+        { lng: 31.625, lat: 22.337, name: "ラムセス2世" },
+        { lng: 135.813, lat: 34.956, name: "小野小町" },
+        { lng: 113.978, lat: 34.143, name: "曹操" },
+        { lng: 104.048, lat: 30.647, name: "劉備" },
+        { lng: 112.938, lat: 28.228, name: "孫堅" },
+        { lng: 30.298, lat: 59.929, name: "グレゴリー・ラスプーチン" },
+        { lng: 45.636, lat: 31.322, name: "ギルガメッシュ" },
+        { lng: 6.453, lat: 51.661, name: "ジークフリート" },
+        { lng: 38.650, lat: 58.683, name: "バーバ・ヤーガ" },
+        { lng: 32.183, lat: 61.850, name: "シモ・ヘイヘ" },
+        { lng: 107.240, lat: 34.296, name: "太公望" },
+        { lng: 23.743, lat: 37.974, name: "アリストテレス" },
+        { lng: 10.396, lat: 43.723, name: "ガリレオ・ガリレイ" },
+        { lng: 138.204, lat: 37.145, name: "上杉謙信" },
+        { lng: 138.577, lat: 35.686, name: "武田信玄" },
+        { lng: 50.587, lat: 36.396, name: "ハサン・サッバーフ" },
+        { lng: 133.626, lat: 33.582, name: "長宗我部元親" },
+        { lng: 30.513, lat: 50.448, name: "ドブルイニャ・ニキチッチ" }
+    ];
+
+    const appData = [];
+
+    function addLocationToMap(loc) {
+        const listContainer = document.getElementById('location-list');
+
+        const popup = new maplibregl.Popup({ offset: 25, closeOnClick: false })
+            .setLngLat([loc.lng, loc.lat]) 
+            .setHTML(`<strong>${loc.name}</strong>`);
+
+        const marker = new maplibregl.Marker({ color: 'red' })
+            .setLngLat([loc.lng, loc.lat])
+            .setPopup(popup) 
+            .addTo(map);
+
+        const item = document.createElement('div');
+        item.className = 'loc-item';
+        
+        const nameSpan = document.createElement('div');
+        nameSpan.className = 'loc-name';
+        nameSpan.innerHTML = `<strong>${loc.name}</strong>`;
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerText = '削除';
+
+        item.appendChild(nameSpan);
+        item.appendChild(delBtn);
+        
+        nameSpan.onclick = () => {
+            map.flyTo({ center: [loc.lng, loc.lat], zoom: 6 });
+            popup.addTo(map);
+        };
+
+        const dataObj = { loc, marker, popup, item };
+        appData.push(dataObj);
+
+        delBtn.onclick = (e) => {
+            e.stopPropagation(); 
+            removeLocation(dataObj);
+        };
+
+        listContainer.appendChild(item);
+
+        if (!document.getElementById('toggle-markers-chk').checked) {
+            marker.getElement().style.display = 'none';
+        }
+        if (document.getElementById('toggle-popups-chk').checked) {
+            popup.addTo(map);
+        }
+
+        return dataObj;
+    }
+
+    function removeLocation(dataObj) {
+        dataObj.marker.remove(); 
+        dataObj.popup.remove();  
+        dataObj.item.remove();   
+        
+        const index = appData.indexOf(dataObj);
+        if (index > -1) {
+            appData.splice(index, 1);
+        }
+    }
+
+    map.on('style.load', () => {
+        map.setProjection({ type: 'globe' });
+        initialLocations.forEach(loc => addLocationToMap(loc));
+    });
+
+    const toggleEditBtn = document.getElementById('toggle-edit-btn');
+    const editControls = document.getElementById('edit-controls');
+    toggleEditBtn.addEventListener('click', () => {
+        const isActive = editControls.classList.toggle('active');
+        toggleEditBtn.textContent = isActive ? '閉じる' : '⚙️ 編集メニューを開く';
+        
+        if (!isActive) {
+            document.getElementById('location-list').classList.remove('delete-mode');
+            document.getElementById('toggle-delete-mode-btn').style.background = '';
+            document.getElementById('toggle-delete-mode-btn').style.color = '';
+        }
+    });
+
+    const toggleDeleteModeBtn = document.getElementById('toggle-delete-mode-btn');
+    toggleDeleteModeBtn.addEventListener('click', () => {
+        const list = document.getElementById('location-list');
+        const isDeleteMode = list.classList.toggle('delete-mode');
+        
+        if (isDeleteMode) {
+            toggleDeleteModeBtn.style.background = '#e74c3c';
+            toggleDeleteModeBtn.style.color = 'white';
+        } else {
+            toggleDeleteModeBtn.style.background = '';
+            toggleDeleteModeBtn.style.color = '';
+        }
+    });
+
+    const addModal = document.getElementById('add-modal');
+    document.getElementById('show-add-modal-btn').addEventListener('click', () => {
+        addModal.classList.add('active');
+    });
+    
+    document.getElementById('cancel-add-btn').addEventListener('click', () => {
+        addModal.classList.remove('active');
+    });
+
+    function toHalfWidth(str) {
+        if (!str) return "";
+        let half = str.replace(/ /g, ''); 
+        half = half.replace(/[０-９．]/g, function(s) { 
+            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+        });
+        half = half.replace(/[－ー−–—]/g, '-'); 
+        return half.trim();
+    }
+
+    document.getElementById('submit-add-btn').addEventListener('click', () => {
+        const nameVal = document.getElementById('add-name').value.trim() || '名称未設定';
+        const lngRaw = toHalfWidth(document.getElementById('add-lng').value);
+        const latRaw = toHalfWidth(document.getElementById('add-lat').value);
+
+        const lngVal = parseFloat(lngRaw);
+        const latVal = parseFloat(latRaw);
+
+        if (isNaN(lngVal) || isNaN(latVal)) {
+            alert('追加できません。経度と緯度には正しい数字を入力してください。');
+            return;
+        }
+
+        if (lngVal < -180 || lngVal > 180 || latVal < -90 || latVal > 90) {
+            alert('追加できません。\n\n【正しい範囲】\n・経度: -180 から 180 の間\n・緯度: -90 から 90 の間\n\n※経度と緯度の入力が逆になっていないか確認してください。');
+            return;
+        }
+
+        const newObj = addLocationToMap({ name: nameVal, lng: lngVal, lat: latVal });
+
+        map.flyTo({ center: [lngVal, latVal], zoom: 6 });
+        newObj.popup.addTo(map);
+
+        document.getElementById('add-name').value = '';
+        document.getElementById('add-lng').value = '';
+        document.getElementById('add-lat').value = '';
+        addModal.classList.remove('active');
+    });
+
+    
+    document.getElementById('fast-map-btn').addEventListener('click', () => {
+        map.flyTo({ center: initialCenter, zoom: initialZoom, bearing: 0, pitch: 0, speed: 1.2 });
+        if (!document.getElementById('toggle-popups-chk').checked) {
+            appData.forEach(data => data.popup.remove());
+        }
+    });
+
+    document.getElementById('toggle-markers-chk').addEventListener('change', (e) => {
+        const show = e.target.checked;
+        appData.forEach(data => {
+            data.marker.getElement().style.display = show ? 'block' : 'none';
+        });
+    });
+
+    document.getElementById('toggle-popups-chk').addEventListener('change', (e) => {
+        const show = e.target.checked;
+        appData.forEach(data => {
+            if (show) data.popup.addTo(map);
+            else data.popup.remove();
+        });
+    });
+
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+    const sidebar = document.getElementById('sidebar');
+    const resizer = document.getElementById('resizer');
+    const mapContainer = document.getElementById('map-container');
+    let lastSidebarWidth = '300px'; 
+    let isResizing = false;
+
+    toggleSidebarBtn.addEventListener('click', () => {
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        resizer.classList.toggle('hidden');
+        if (isCollapsed) {
+            toggleSidebarBtn.textContent = 'リストを開く';
+        } else {
+            toggleSidebarBtn.textContent = 'リストを閉じる';
+            sidebar.style.width = lastSidebarWidth;
+        }
+        map.resize();
+        setTimeout(() => map.resize(), 50);
+    });
+
+    resizer.addEventListener('mousedown', (e) => {
+        if (sidebar.classList.contains('collapsed')) return;
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        mapContainer.style.pointerEvents = 'none'; 
+        e.preventDefault(); 
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        let newWidth = e.clientX;
+        if (newWidth > 150 && newWidth < window.innerWidth * 0.8) {
+            lastSidebarWidth = newWidth + 'px'; 
+            sidebar.style.width = lastSidebarWidth;
+            map.resize(); 
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = 'default';
+            mapContainer.style.pointerEvents = 'auto'; 
+            map.resize(); 
+        }
+    });
+</script>
+</body>
+</html>

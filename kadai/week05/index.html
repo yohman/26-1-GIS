@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 5 Student Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .home-button a {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .home-button a:hover {
+            background: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1px;
+            background: #ddd;
+            border: 1px solid #ddd;
+        }
+        
+        .gallery-item {
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 160px;
+        }
+        
+        .gallery-item:hover {
+            background: #f5f5f5;
+            border-color: #000;
+        }
+        
+        .gallery-item.no-html {
+            cursor: default;
+            opacity: 0.4;
+        }
+        
+        .gallery-item.no-html:hover {
+            background: white;
+            border-color: #ddd;
+        }
+        
+        .gallery-item .student-id {
+            font-size: 0.65rem;
+            color: #999;
+            font-weight: normal;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .gallery-item .student-name {
+            font-size: 0.8rem;
+            color: #000;
+            font-weight: normal;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .gallery-item .submit-date {
+            font-size: 0.65rem;
+            color: #666;
+            font-weight: normal;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .gallery-item {
+                min-height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-button">
+        <a href="../index.html">HOME</a>
+    </div>
+    
+    <div class="container">
+        <h1>YOH'S 2026 REITAKU GIS MINIONS</h1>
+        <p class="subtitle">Click thumbnail to view</p>
+        
+        <div class="gallery" id="gallery">
+            <!-- Gallery items will be inserted here by JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        // Load gallery data from JSON
+        fetch('data/gallery_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('gallery');
+                const students = data.students;
+                
+                students.forEach(student => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    
+                    if (!student.html) {
+                        galleryItem.classList.add('no-html');
+                    } else {
+                        galleryItem.onclick = () => {
+                            window.location.href = student.html;
+                        };
+                    }
+                    
+                    // Simple text-based display with katakana
+                    let nameDisplay = student.name;
+                    if (student.katakana) {
+                        nameDisplay = `${student.name}<br><span style="font-size:0.7rem;color:#999;">${student.katakana}</span>`;
+                    }
+                    
+                    galleryItem.innerHTML = `
+                        <div class="student-id">${student.id}</div>
+                        <div class="student-name">${nameDisplay}</div>
+                        <div class="submit-date">${student.date}</div>
+                    `;
+                    
+                    gallery.appendChild(galleryItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading gallery data:', error);
+                document.getElementById('gallery').innerHTML = '<p style="text-align:center;color:red;">Error loading gallery data</p>';
+            });
+    </script>
+</body>
+</html>

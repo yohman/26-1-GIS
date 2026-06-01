@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .home-button a {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .home-button a:hover {
+            background: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1px;
+            background: #ddd;
+            border: 1px solid #ddd;
+        }
+        
+        .gallery-item {
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .gallery-item:hover {
+            background: #e8e8e8;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .gallery-item .info {
+            padding: 8px;
+            background: white;
+            border-top: 1px solid #ddd;
+        }
+        
+        .gallery-item .student-id {
+            font-size: 0.7rem;
+            color: #000;
+            font-weight: normal;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .gallery-item img {
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-button">
+        <a href="../index.html">HOME</a>
+    </div>
+    
+    <div class="container">
+        <h1>YOH'S 2026 REITAKU GIS MINIONS</h1>
+        <p class="subtitle">Click thumbnail to view</p>
+        
+        <div class="gallery" id="gallery">
+            <!-- Gallery items will be inserted here by JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        const students = [
+            {id: '1254510229', name: '岩田知機', file: '1254510229_1_1_photo.jpg', html: '1254510229_1_2_index.html'},
+            {id: '1254510336', name: '大熊 悠也', file: '1254510336_1_2_photo.jpg', html: '1254510336_1_1_index.html'},
+            {id: '1254510435', name: '岡野俊介', file: '1254510435_1_2_photo.jpg.jpg', html: '1254510435_1_1_index.html'},
+            {id: '1254510534', name: '川合 悠', file: '1254510534_1_2_photo.jpg', html: '1254510534_1_3_index.html'},
+            {id: '1254510865', name: '佐藤 太陽', file: '1254510865_1_1_photo.jpg', html: '1254510865_1_2_index.html'},
+            {id: '1254511136', name: 'ここに自分の名前を書く', file: '1254511136_1_2_photo.jpg', html: '1254511136_1_1_gis.html'},
+            {id: '1254511160', name: 'ここに自分の名前を書く', file: '1254511160_1_1_photo.jpg', html: '1254511160_1_2_index.html'},
+            {id: '1254511251', name: '土屋響輝', file: '1254511251_1_2_photo.jpg', html: '1254511251_1_1_index.html'},
+            {id: '1254511805', name: '吉澤一生', file: '1254511805_1_2_photo.jpg', html: '1254511805_1_1_gis.html'},
+            {id: '1254511912', name: 'ichika', file: '1254511912_1_2_photo.jpg', html: '1254511912_1_1_index.html'},
+            {id: '1254690352', name: 'JEON YUBEEN ゆびん', file: '1254690352_1_1_photo.jpg', html: '1254690352_1_3_index.html'},
+            {id: '1254690435', name: 'Meven Steeve Perera', file: '1254690435_1_2_photo.jpeg', html: '1254690435_1_1_index.html'},
+            {id: '1254810059', name: 'Kakeru Awano', file: '1254810059_1_2_ore.jpg', html: '1254810059_1_1_zzzk_GIS.html'},
+            {id: '1254810075', name: '石引響', file: '1254810075_1_1_photo.jpg', html: '1254810075_1_3_index.html'},
+            {id: '1254810124', name: '江口 歩真', file: '1254810124_1_2_photo.jpg', html: '1254810124_1_1_gis.html'},
+            {id: '1254810140', name: '■■■■■ hello!! =）■■■■■', file: '1254810140_1_2_photo.jpg', html: '1254810140_1_1_inedx.HTML'},
+            {id: '1254810166', name: '小川 史温', file: '1254810166_1_2_IMG_3715.jpg', html: '1254810166_1_1_index.html'},
+            {id: '1254810174', name: 'Shun Onitsuka', file: '1254810174_1_1_imageああ.jpg', html: '1254810174_1_3_GIS第三回課題REASE.html'},
+            {id: '1254810182', name: '柿木奏太', file: '1254810182_1_2_photo.jpeg', html: '1254810182_1_1_index.html'},
+            {id: '1254810372', name: 'Riku Sato', file: '1254810372_1_2_IMG_4545.jpg', html: '1254810372_1_1_index.html'},
+            {id: '1254810405', name: '柴田 尚槻', file: '1254810405_1_2_photo.jpg', html: '1254810405_1_1_index.html'},
+            {id: '1254810512', name: 'Keigo Takeda', file: '1254810512_1_2_IMG_7470.jpeg', html: '1254810512_1_1_index.html'},
+            {id: '1254810736', name: '三浦 和道', file: '1254810736_1_2_photo.jpg', html: '1254810736_1_1_index.html'},
+            {id: '1254810794', name: '桃井優', file: '1254810794_1_4_me.jpeg', html: '1254810794_1_1_index.html'},
+            {id: '1254810801', name: 'Souta Morimoto', file: '1254810801_1_1_IMG_7665.JPG', html: '1254810801_1_2_index.html'},
+            {id: '1254810827', name: '八重樫旺樹', file: '1254810827_1_3_photo.jpg', html: '1254810827_1_1_index.html'},
+            {id: '1254810926', name: 'Yoshida Soji', file: '1254810926_1_2_IMG_5931.jpeg', html: '1254810926_1_1_index.html'},
+            {id: '1254810976', name: '坂本 快', file: '1254810976_1_2_photo.jpg', html: '1254810976_1_1_index.html'},
+            {id: '1254810992', name: 'モンテラ エドウィン', file: '1254810992_1_2_IMG_2169.jpeg', html: '1254810992_1_1_index.html'},
+            {id: '1254811049', name: '田柳光将', file: '1254811049_1_2_photo.jpg', html: '1254811049_1_1_index.html'},
+            {id: '1254820222', name: '神戸宗一郎', file: '1254820222_1_1_6436.jpg', html: '1254820222_1_3_index.html'}
+        ];
+        
+        const gallery = document.getElementById('gallery');
+        
+        students.forEach(student => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.onclick = () => {
+                window.location.href = student.html;
+            };
+            
+            galleryItem.innerHTML = `
+                <img src="${student.file}" alt="${student.name}" loading="lazy">
+                <div class="info">
+                    <div class="student-id">${student.name}</div>
+                </div>
+            `;
+            
+            gallery.appendChild(galleryItem);
+        });
+    </script>
+</body>
+</html>

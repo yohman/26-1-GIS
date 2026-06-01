@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 文字エンコーディングをUTF-8に設定(日本語などの文字化けを防ぐ) -->
+    <meta charset="utf-8">
+    <!-- ブラウザのタブに表示されるページタイトル -->
+    <title>好きなラーメン屋ランキング</title>
+    <!-- MapLibre GLのスタイルシート(地図の見た目を定義) -->
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+    
+    <style>
+        /* ===== ページ全体の設定 ===== */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        /* ===== 地図コンテナの設定 ===== */
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810174</div>
+        <div style="font-size:12px;margin-bottom:3px;">鬼塚　駿</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/25 10:13</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/9kmlZVpJz7vnapgV" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810124_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810182_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+    <!-- 地図を表示するための空のコンテナ (id="map"で識別) -->
+    <div id="map"></div>
+
+    <!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+    <script>
+        // ===== 地図の初期化 =====
+        // 新しい地図オブジェクトを作成
+        const map = new maplibregl.Map({
+            container: 'map', // 地図を表示する要素のID
+            
+            // 【PDF Step 7 対策】わかりやすい日本のラスタタイル地図（国土地理院）にスタイルを変更
+            style: {
+                version: 8,
+                sources: {
+                    地理院地図: {
+                        type: 'raster',
+                        tiles: [
+                            'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: "地理院地図"
+                    }
+                },
+                layers: [
+                    {
+                        id: '地理院地図レイヤー',
+                        type: 'raster',
+                        source: '地理院地図',
+                        minzoom: 0,
+                        maxzoom: 18
+                    }
+                ]
+            },
+            center: [139.82, 35.84], // 3つの店舗がすべて画面に収まりやすい中心位置に微調整
+            zoom: 11 // ズームレベル
+        });
+
+        // ===== ナビゲーションコントロールの追加 =====
+        map.addControl(new maplibregl.NavigationControl());
+
+        // ===== マーカーとポップアップの追加（ランキング順） =====
+
+        // 1位：一蘭 イオンレイクタウン店
+        new maplibregl.Marker()
+            .setLngLat([139.8251, 35.8790]) // レイクタウン
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML("<h3>👑 第1位：一蘭</h3><p>イオンレイクタウン店<br>自分だけの味集中カウンターで楽しむ極上とんこつ！</p>")
+            )
+            .addTo(map);
+
+        // 2位：雷 本店
+        new maplibregl.Marker()
+            .setLngLat([139.9113, 35.8010]) // 北松戸
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML("<h3>🥈 第2位：雷 本店</h3><p>千葉県北松戸市<br>ガツンとくる濃厚なスープと極太麺が最高な二郎インスパイア！</p>")
+            )
+            .addTo(map);
+
+        // 3位：塩つけ麺 めいげんそ
+        new maplibregl.Marker()
+            .setLngLat([139.7912, 35.8764]) // 南越谷駅
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML("<h3>🥉 第3位：塩つけ麺 めいげんそ</h3><p>南越谷駅<br>旨味が凝縮された濃厚塩つけ麺、駅チカで通いたくなる味！</p>")
+            )
+            .addTo(map);
+    </script>
+</body>
+</html>

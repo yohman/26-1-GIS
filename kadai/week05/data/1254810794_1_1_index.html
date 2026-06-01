@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>国内旅行の思い出マップ</title>
+<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+<link rel="stylesheet" href="1254810794_1_2_style.css">
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810794</div>
+        <div style="font-size:12px;margin-bottom:3px;">桃井　優<br><span style='font-size:9px;color:#999;'>モモイ　ユウ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/02 00:10</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/E851Q0OgEK2VaVAb" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810736_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810926_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+<div id="map"></div>
+<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+<script>
+const map = new maplibregl.Map({
+  container: 'map',
+  style: 'https://tiles.openfreemap.org/styles/liberty', // Googleマップ風スタイル
+  center: [141.3545, 42.5000], // スタート位置（北海道の中心付近）
+  zoom: 7.5 // 札幌周辺が初期状態で綺麗にまとまるズームレベルに調整
+});
+
+map.addControl(new maplibregl.NavigationControl());
+
+const locations = [
+  {lng: 140.7264, lat: 41.7737, name: "函館", memo: "朝８時に出発して新幹線で牛タン弁当を食べながらのんびり旅"},
+  {lng: 140.71630259410148, lat: 41.76652468033366, name: "金森赤レンガ倉庫", memo: "函館の観光スポット。近くのラッキーピエロでハンバーガーとオムライスを食べて、夜はライトアップされた倉庫がとても綺麗だった"}, // ← ここにコンマを追加しました
+  {lng: 140.70386685625692, lat: 41.759284406935116, name: "函館山", memo: "ロープウェイで山頂へ。景色がとても綺麗で、函館の街並みが一望できた"},
+  {lng: 140.75655216321323, lat: 41.79712033968091, name: "五稜郭", memo: "五稜郭タワーからの眺めが最高で、歴史的な場所を感じることができた"},
+  {lng: 141.3545, lat: 43.0687, name: "札幌", memo: "函館から特急で4時間かけて札幌へ。時計台や大通公園を散策し、すぐ次の町へ！"},
+  {lng: 141.0019, lat: 43.1907, name: "小樽", memo: "札幌から電車で30分。運河沿いの街並みがとてもロマンチックで、LeTAOのスイーツも楽しめた"},
+  {lng: 141.6869, lat: 42.7752, name: "新千歳空港", memo: "小樽から電車で40分。帰りの飛行機に乗る前に、空港内でラーメンを食べて、北海道の味を最後まで楽しんだりお土産を買ったりして、旅の締めくくりにぴったりだった"}
+];
+
+// 電車（特急・快速）や観光ルートに沿った詳細な地理座標データ
+const detailedRoute = [
+  // 1. 函館市内観光（市電・徒歩・ロープウェイなど）
+  { coord: [140.7264, 41.7737], emoji: "🚶" }, // 函館駅
+  { coord: [140.7163, 41.7665], emoji: "🚶" }, // 金森赤レンガ倉庫
+  { coord: [140.7039, 41.7593], emoji: "🚡" }, // 函館山
+  { coord: [140.7300, 41.7650], emoji: "🚋" }, // 市電
+  { coord: [140.7565, 41.7971], emoji: "🚋" }, // 五稜郭
+
+  // 2. 特急北斗（将来の北海道新幹線ルート）：函館（五稜郭）から札幌へ
+  { coord: [140.7300, 41.8300], emoji: "🚄" }, // 七飯
+  { coord: [140.6483, 41.9047], emoji: "🚄" }, // 新函館北斗
+  { coord: [140.6558, 42.0298], emoji: "🚄" }, // 大沼公園
+  { coord: [140.5122, 42.1092], emoji: "🚄" }, // 森
+  { coord: [140.3831, 42.2241], emoji: "🚄" }, // 八雲
+  { coord: [140.1278, 42.5119], emoji: "🚄" }, // 長万部
+  { coord: [140.5147, 42.5806], emoji: "🚄" }, // 洞爺
+  { coord: [140.7569, 42.5522], emoji: "🚄" }, // 伊達紋別
+  { coord: [140.9883, 42.3392], emoji: "🚄" }, // 東室蘭
+  { coord: [141.2561, 42.5028], emoji: "🚄" }, // 登別
+  { coord: [141.6031, 42.6386], emoji: "🚄" }, // 苫小牧
+  { coord: [141.6844, 42.8094], emoji: "🚄" }, // 南千歳
+  { coord: [141.4883, 43.0225], emoji: "🚄" }, // 新札幌
+  { coord: [141.3545, 43.0687], emoji: "🚄" }, // 札幌駅
+
+  // 3. JR函館本線：札幌から小樽へ（石狩湾沿いの美しい海岸線ルート）
+  { coord: [141.3000, 43.0750], emoji: "🚃" }, // 琴似
+  { coord: [141.2435, 43.1256], emoji: "🚃" }, // 手稲
+  { coord: [141.1717, 43.1411], emoji: "🚃" }, // 銭函（ここから美しい海岸線！）
+  { coord: [141.0800, 43.1700], emoji: "🚃" }, // 朝里
+  { coord: [141.0315, 43.1818], emoji: "🚃" }, // 小樽築港
+  { coord: [141.0068, 43.1895], emoji: "🚃" }, // 南小樽
+  { coord: [141.0019, 43.1907], emoji: "🚃" }, // 小樽駅
+
+  // 4. JR快速エアポート（復路）：小樽から札幌を経由し新千歳空港へ
+  { coord: [141.0315, 43.1818], emoji: "🚃" },
+  { coord: [141.1717, 43.1411], emoji: "🚃" },
+  { coord: [141.2435, 43.1256], emoji: "🚃" },
+  { coord: [141.3545, 43.0687], emoji: "🚃" },
+  { coord: [141.4883, 43.0225], emoji: "🚃" },
+  { coord: [141.5900, 42.9800], emoji: "🚃" },
+  { coord: [141.5800, 42.8800], emoji: "🚃" },
+  { coord: [141.6400, 42.8200], emoji: "🚃" },
+  { coord: [141.6844, 42.8094], emoji: "🚃" },
+  { coord: [141.6869, 42.7752], emoji: "✈️" }  // 新千歳空港 (帰りの飛行機)
+];
+
+map.on('load', () => {
+  // 詳細な線路の軌道データをGeoJSON用に配列化
+  const lineCoordinates = detailedRoute.map(item => item.coord);
+
+  map.addSource('route', {
+    'type': 'geojson',
+    'data': {
+      'type': 'Feature',
+      'properties': {},
+      'geometry': {
+        'type': 'LineString',
+        'coordinates': lineCoordinates
+      }
+    }
+  });
+
+  // 高級感のある線路スタイル（1. 太いスレートグレーの土台）
+  map.addLayer({
+    'id': 'route-base',
+    'type': 'line',
+    'source': 'route',
+    'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+    },
+    'paint': {
+      'line-color': '#475569', 
+      'line-width': 6
+    }
+  });
+
+  // 高級感のある線路スタイル（2. 白い枕木のような細かい破線）
+  map.addLayer({
+    'id': 'route-sleepers',
+    'type': 'line',
+    'source': 'route',
+    'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+    },
+    'paint': {
+      'line-color': '#ffffff',
+      'line-width': 4,
+      'line-dasharray': [1, 2] // 枕木のシマシマ感を表現
+    }
+  });
+
+  // 動く乗り物（電車・タクシー・飛行機など）用のソースを追加
+  map.addSource('train', {
+    'type': 'geojson',
+    'data': {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': detailedRoute[0].coord
+      },
+      'properties': {
+        'icon': detailedRoute[0].emoji
+      }
+    }
+  });
+
+  // 動く乗り物のシンボルレイヤーを追加
+  map.addLayer({
+    'id': 'train-symbol',
+    'type': 'symbol',
+    'source': 'train',
+    'layout': {
+      'text-field': ['get', 'icon'],
+      'text-size': 26,
+      'text-keep-upright': true,
+      'text-anchor': 'center'
+    }
+  });
+
+  // 乗り物のアニメーションループ
+  let currentRouteIndex = 0;
+  let t = 0; // 補間割合（0〜1）
+  const speed = 0.05; // アニメーション速度（小さいほどスムーズでゆっくり動く）
+
+  function animateTrain() {
+    if (currentRouteIndex >= detailedRoute.length - 1) {
+      currentRouteIndex = 0;
+      t = 0;
+    }
+
+    const start = detailedRoute[currentRouteIndex];
+    const end = detailedRoute[currentRouteIndex + 1];
+
+    // 線形補間で滑らかな位置変更
+    const lng = start.coord[0] + (end.coord[0] - start.coord[0]) * t;
+    const lat = start.coord[1] + (end.coord[1] - start.coord[1]) * t;
+
+    // 現在の区間の乗り物絵文字を設定
+    const currentEmoji = end.emoji;
+
+    map.getSource('train').setData({
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': [lng, lat]
+      },
+      'properties': {
+        'icon': currentEmoji
+      }
+    });
+
+    t += speed;
+    if (t >= 1) {
+      t = 0;
+      currentRouteIndex++;
+    }
+
+    requestAnimationFrame(animateTrain);
+  }
+
+  animateTrain();
+
+  const features = locations.map(loc => ({
+    'type': 'Feature',
+    'properties': { 'name': loc.name, 'memo': loc.memo },
+    'geometry': { 'type': 'Point', 'coordinates': [loc.lng, loc.lat] }
+  }));
+
+  map.addSource('places', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: features
+    },
+    cluster: true, // まとめて数字を表示する設定
+    clusterMaxZoom: 9, // ズームレベル9までクラスター化（札幌近郊がバラける手前）
+    clusterRadius: 60 // 札幌・小樽・新千歳が初期状態で綺麗に1つの円に収まる範囲に調整
+  });
+
+  // まとまった数字の円（クラスター）のデザイン
+  map.addLayer({
+    id: 'clusters',
+    type: 'circle',
+    source: 'places',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': '#2196F3', // Google風の青
+      'circle-radius': 22,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#fff'
+    }
+  });
+
+  // クラスターの数字テキスト
+  map.addLayer({
+    id: 'cluster-count',
+    type: 'symbol',
+    source: 'places',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count}',
+      'text-font': ['Noto Sans Regular'],
+      'text-size': 13
+    },
+    paint: {
+      'text-color': '#fff'
+    }
+  });
+
+  // 単体のピンのデザイン
+  map.addLayer({
+    id: 'unclustered-point',
+    type: 'circle',
+    source: 'places',
+    filter: ['!', ['has', 'point_count']],
+    paint: {
+      'circle-color': '#EA4335', // Google風の赤
+      'circle-radius': 9,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#fff'
+    }
+  });
+
+  // 数字の円をクリックしたときにズームインしてばらす処理
+  map.on('click', 'clusters', (e) => {
+    const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+    const clusterId = features[0].properties.cluster_id;
+    map.getSource('places').getClusterExpansionZoom(clusterId).then((zoom) => {
+      map.easeTo({
+        center: features[0].geometry.coordinates,
+        zoom: zoom + 0.5 // しっかりばらけるように少し多めにズーム
+      });
+    });
+  });
+
+  // ピンをクリックしたときにポップアップを表示する処理
+  map.on('click', 'unclustered-point', (e) => {
+    const coordinates = e.features[0].geometry.coordinates.slice();
+    const props = e.features[0].properties;
+
+    new maplibregl.Popup({ offset: 10 })
+      .setLngLat(coordinates)
+      .setHTML(`<h3>${props.name}</h3><p>${props.memo}</p>`)
+      .addTo(map);
+  });
+
+  // カーソル演出
+  map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
+});
+</script>
+</body>
+</html>

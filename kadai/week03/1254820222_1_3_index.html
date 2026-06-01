@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+    <head>
+        <!-- 文字化けを防ぐ設定 -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>My Page</title>
+        <!-- Google Fonts: Poppins + Kosugi Maru (日本語をポップ体風にするため) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Kosugi+Maru&display=swap" rel="stylesheet">
+        <style>
+            /* 全要素に Poppins（英字） + Kosugi Maru（和文ポップ風）を強制適用します。
+               注意: Poppins はラテン文字用のフォントで日本語グリフを含みません。
+               そのため日本語は Kosugi Maru（丸ゴシックのポップ風）で表示されます。 */
+            :root { --pop-font: 'Poppins', 'Kosugi Maru', system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; }
+            html, body, * { font-family: var(--pop-font) !important; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+            /* フォーム要素やUIも継承 */
+            button, input, select, textarea { font-family: inherit !important; }
+
+            /* 背景画像を画面全体に引き延ばす（cover）設定 */
+            body {
+                background-image: url('6436.jpg');
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            /* inline img を非表示にして背景化と競合しないようにする */
+            img.hero-hidden { display: none !important; }
+
+            #audio-section { margin-top:16px }
+            #play-btn { padding:8px 12px }
+        </style>
+    </head>
+
+    <body>
+    <div style="position:fixed;top:20px;right:20px;display:flex;gap:5px;z-index:9999;"><a href="1254811049_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><span style="background:#666;color:#999;padding:10px 20px;font-family:'Courier New',monospace;font-size:12px;">NEXT</span></div>
+
+    
+
+
+
+<!-- 自分の名前 -->
+        <h1>神戸宗一郎</h1>
+
+    <!-- 写真（背景化するため非表示） -->
+    <img class="hero-hidden" src="1254820222_1_1_6436.jpg" width="300" alt="神戸宗一郎" />
+
+        <!-- オーディオ再生セクション -->
+        <section id="audio-section">
+            <h2>make beat</h2>
+
+            <audio id="audio" controls preload="none">
+                <source src="アマルガム.mp3" type="audio/mpeg">
+                お使いのブラウザは audio 要素に対応していません。
+            </audio>
+
+            <div style="margin-top:8px">
+                <button id="play-btn" style="display:none">音を再生</button>
+                <small id="note">ページ読み込み後に自動再生を試みます。ブロックされた場合はボタンで再生してください。</small>
+            </div>
+        </section>
+
+        <!-- 自己紹介 -->
+        <p>
+            神戸宗一郎a.k.a.TOBRA
+            松戸でラップやってます、サイファー大好きです
+            去年作成したhiphopマップを完成させたいと思っています
+        </p>
+
+        <!-- リンク -->
+        <h2>My Favorite Websites / Maps</h2>
+        <ul>
+            <li>
+                気になるWebマップ：
+                <a href="https://artist-map.kgetheshadowmen.com" target="_blank" rel="noopener">hiphop map</a>
+            </li>
+            <li>
+                好きなWebサイト：
+                <a href="https://notfound404.stores.jp" target="_blank" rel="noopener">notfound</a>
+            </li>
+        </ul>
+
+        <script>
+            (function(){
+                const audio = document.getElementById('audio');
+                const playBtn = document.getElementById('play-btn');
+                const note = document.getElementById('note');
+
+                function tryAutoplay(){
+                    audio.play().then(()=>{
+                        note.textContent = '自動再生に成功しました。';
+                    }).catch(()=>{
+                        playBtn.style.display = '';
+                        note.textContent = '自動再生はブラウザによりブロックされました。ボタンで再生してください。';
+                    });
+                }
+
+                playBtn.addEventListener('click', ()=>{
+                    audio.play();
+                    playBtn.style.display = 'none';
+                });
+
+                    document.addEventListener('DOMContentLoaded', tryAutoplay);
+                    })();
+            </script>
+
+            <script>
+                (function(){
+                    // 画像から平均色を取り、ページ背景に適用する
+                    const imgSrc = '6436.jpg';
+                    const img = new Image();
+                    img.src = imgSrc;
+
+                    img.onload = () => {
+                        try {
+                            const sampleSize = 100; // 小さなキャンバスに縮小して平均を取る
+                            const canvas = document.createElement('canvas');
+                            canvas.width = sampleSize;
+                            canvas.height = sampleSize;
+                            const ctx = canvas.getContext('2d');
+                            // 画像をキャンバスに収めて描画
+                            ctx.drawImage(img, 0, 0, sampleSize, sampleSize);
+
+                            const imgData = ctx.getImageData(0, 0, sampleSize, sampleSize).data;
+                            let r = 0, g = 0, b = 0, count = 0;
+                            for (let i = 0; i < imgData.length; i += 4) {
+                                r += imgData[i];
+                                g += imgData[i+1];
+                                b += imgData[i+2];
+                                count++;
+                            }
+                            r = Math.round(r / count);
+                            g = Math.round(g / count);
+                            b = Math.round(b / count);
+
+                            const bg = `rgb(${r}, ${g}, ${b})`;
+                            document.documentElement.style.transition = 'background-color 400ms ease';
+                            document.body.style.backgroundColor = bg;
+
+                            // コントラストを見て文字色を決定
+                            const luminance = 0.2126*r + 0.7152*g + 0.0722*b;
+                            const textColor = luminance < 130 ? '#ffffff' : '#111111';
+                            document.body.style.color = textColor;
+                            // リンク等も合わせる
+                            document.querySelectorAll('a').forEach(a => a.style.color = textColor);
+                        } catch (err) {
+                            console.warn('画像から色を抽出できませんでした:', err);
+                        }
+                    };
+
+                    img.onerror = () => {
+                        console.warn('画像の読み込みに失敗しました:', imgSrc);
+                    };
+                })();
+            </script>
+    </body>
+</html>

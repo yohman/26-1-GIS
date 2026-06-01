@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Popup Markers</title>
+
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100%; height: 100vh; }
+
+        .marker-label {
+            background: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 4px;
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+
+        .named-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510229</div>
+        <div style="font-size:12px;margin-bottom:3px;">岩田　知機<br><span style='font-size:9px;color:#999;'>イワタ　チキ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/05/31 15:27</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/PVKBQOpD3em5Zj5x" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254820222_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510435_1_1_index (1).html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json',
+            center: [137.0, 35.5],
+            zoom: 6
+        });
+
+        // ★ ピンの情報（あなたのデータそのまま）
+        const spots = [
+            { lng: 140.47429173122853, lat: 36.3699826871329, name: "1,水戸シネマ", info: "始まりの場所。友達に連れられライビュを見に行った。（NiziU）" },
+            { lng: 139.7417352253738, lat: 35.91978705473098, name: "2,SIBUYA109", info: "目覚めて初めてのPOP UPストア。ラキドロで推しが出ず大散財。しかし、交換会で無事推しをゲットし最高の思い出に。（NiziU）" },
+            { lng: 139.9263456379702, lat: 35.87133333364318, name: "3,TOHOシネマズ流山おおたかの森", info: "二度目のライビュ。目覚めて初めて行ったのでよかった。（NiziU）" },
+            { lng: 139.70540784417295, lat: 35.66852419215556, name: "4,原宿表参道", info: "CDリリースを記念してIVEが表参道をジャック。町中に貼られているポスターを探し回った。（IVE）" },
+            { lng: 139.79426499847526, lat: 35.644165127331604, name: "5,有明アリーナ", info: "24時間テレビチャリティライブにNiziUが出演。初めて実物を拝む。感動。（NiziU）" },
+            { lng: 139.70211422261687, lat: 35.65716165987779, name: "6,渋谷サクラステージBLOOM GATE", info: "aespaとSpotifyがコラボとても楽しいイベントでした。（aespa）" },
+            { lng: 139.70193614459032, lat: 35.66276587774003, name: "7,MIYASHITA PARK", info: "TWICEのお見送り会にまさかの当選。マジでびっくりした。(TWICE)" },
+            { lng: 139.75185910912637, lat: 35.7058486625822, name: "8,東京ドーム", info: "TWICE東京ドームライブ。お見送り会場に行く途中でタオルを紛失結構悲しかった。しかし推しにニコニコ笑顔で手を振っていただいたので問題なし。（TWICE）" },
+            { lng: 139.74967540912584, lat: 35.69351295461289, name: "9,日本武道館", info: "チケットはありませんでしたが現地に出動チケットがなくてもグッズやWithUの雰囲気でとても充実した一日だった。（NiziU）" },
+            { lng: 140.47429173122853, lat: 36.3699826871329, name: "10,水戸シネマ", info: "いつメンでライビュへ。ライブに行けなかったこともあり次回のツアーこそ絶対に行こうと思えたライビュだった。（NiziU）" },
+            { lng: 139.75185910912637, lat: 35.7058486625822, name: "11,東京ドーム", info: "LE SSERAFIM東京ドームライブ。アンコールをめっちゃ長くやってくれてめちゃくちゃ楽しかった。（LE SSERAFIM）" },
+            { lng: 139.70015652446727, lat: 35.66790865951065, name: "12,代々木第一体育館", info: "ついに念願のNiziU単独公演二日間通して行って本当に良かった。マジでよかった。(NiziU)" },
+            { lng: 140.47429173122853, lat: 36.3699826871329, name: "13,水戸シネマ", info: "3度目の水戸シネマでのライビュ。まさかの自分たちが行った公演の様子が映し出され驚いた。(NiziU)" },
+            { lng: 139.75185910912637, lat: 35.7058486625822, name: "14,東京ドーム", info: "aespa東京ドームライブ。花火？の演出がすごかった。耳いかれるかと思った。(aespa)" },
+        ];
+
+        let index = 0;
+
+        // ★ 名前つき＋ポップアップ＋カメラ移動
+        function addNamedMarker(spot, onClick) {
+            const el = document.createElement('div');
+            el.className = 'named-marker';
+
+            const label = document.createElement('div');
+            label.className = 'marker-label';
+            label.textContent = spot.name;
+
+            el.appendChild(label);
+
+            const marker = new maplibregl.Marker(el)
+                .setLngLat([spot.lng, spot.lat])
+                .addTo(map);
+
+            // ★ 新しく出たピンへカメラ移動（これが重要）
+            map.flyTo({
+                center: [spot.lng, spot.lat],
+                zoom: 8,
+                speed:0.5
+            });
+
+            const popup = new maplibregl.Popup({ offset: 25 })
+                .setHTML(`<h3>${spot.name}</h3><p>${spot.info}</p>`);
+
+            marker.setPopup(popup);
+
+            if (onClick) {
+                marker.getElement().addEventListener('click', onClick);
+            }
+        }
+
+        // ★ 最初は何も出さない → 地図タップで1つ目
+        map.on('click', () => {
+            if (index === 0) {
+                addNamedMarker(spots[index], showNextMarker);
+                index++;
+            }
+        });
+
+        // ★ 次のピンを出す
+        function showNextMarker() {
+            if (index < spots.length) {
+                addNamedMarker(spots[index], showNextMarker);
+                index++;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
+
+

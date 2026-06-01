@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>全国・猫カフェ一覧マップ</title>
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100%; height: 100vh; }
+        .popup-content { font-size: 14px; }
+        .search-btn { display: inline-block; margin-top: 8px; padding: 5px 10px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810736</div>
+        <div style="font-size:12px;margin-bottom:3px;">三浦　和道</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/19 20:02</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810562_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810794_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+    <div id="map"></div>
+    <script src="1254810736_1_3_data.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+    <script>
+const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+        version: 8,
+        sources: {
+            // 衛星写真
+            'gsi-satellite': {
+                type: 'raster',
+                // ▼▼▼ ここを以下のURLに書き換えてください ▼▼▼
+                tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+                // ▲▲▲ これで世界最高画質の衛星写真になります ▲▲▲
+                tileSize: 256
+            },
+            // 地名ラベル（国土地理院の地図を重ねて使う）
+            'labels': {
+                type: 'raster',
+                tiles: ['https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png'],
+                tileSize: 256
+            }
+        },
+        layers: [
+            // 下の層：衛星写真
+            { id: 'sat-layer', type: 'raster', source: 'gsi-satellite' },
+            // 上の層：地名（少し薄くして写真を見やすくする）
+            { id: 'label-layer', type: 'raster', source: 'labels', paint: { 'raster-opacity': 0.4 } }
+        ]
+    },
+    center: [137.5, 36.5],
+    zoom: 5
+});
+
+        cafeLocations.forEach(loc => {
+            const color = (loc.type === '猫') ? '#e74c3c' : '#f1c40f';
+            
+            // Google検索用のURLを作成
+            const searchQuery = encodeURIComponent(loc.name);
+            const searchUrl = `https://www.google.com/search?q=${searchQuery}`;
+
+            new maplibregl.Marker({ color: color })
+                .setLngLat([loc.lng, loc.lat])
+                .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
+                    <div class="popup-content">
+                        <h3>${loc.type}カフェ：${loc.name}</h3>
+                        <p>${loc.address}</p>
+                        <a href="${searchUrl}" target="_blank" class="search-btn">Googleで検索</a>
+                    </div>
+                `))
+                .addTo(map);
+        });
+    </script>
+</body>
+</html>

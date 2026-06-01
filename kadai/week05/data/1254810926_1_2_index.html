@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>世界の城マップ</title>
+  <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+  <style>
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+    #map { width: 100vw; height: 100vh; }
+
+    .castle-marker {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      cursor: pointer;
+      overflow: hidden;
+      background: #ccc;
+      transition: transform 0.2s;
+    }
+    .castle-marker:hover { transform: scale(1.15); }
+    .castle-marker img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .maplibregl-popup-content {
+      padding: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 260px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .popup-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .popup-body {
+      padding: 12px 14px;
+    }
+    .popup-body h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: #222;
+    }
+    .popup-body .popup-location {
+      font-size: 12px;
+      color: #888;
+      margin: 0 0 8px;
+    }
+    .popup-body p {
+      margin: 0;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810926</div>
+        <div style="font-size:12px;margin-bottom:3px;">吉田　爽二<br><span style='font-size:9px;color:#999;'>ヨシダ　ソウジ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/01 21:06</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810794_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254820222_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+  <div id="map"></div>
+  <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+  <script>
+    const castles = [
+      {
+        name: "ボイニツェ城",
+        nameEn: "Bojnice Castle",
+        location: "スロバキア・ボイニツェ",
+        coords: [18.5739, 48.7822],
+        wiki: "Bojnice_Castle",
+        desc: "12世紀に建てられたロマン主義様式の城。スロバキアで最も人気の観光地のひとつで、ファンタジー映画の撮影地としても有名。"
+      },
+      {
+        name: "シュノンソー城",
+        nameEn: "Château de Chenonceau",
+        location: "フランス・シュノンソー",
+        coords: [1.0700, 47.3246],
+        wiki: "Château_de_Chenonceau",
+        desc: "シェール川に架かるように建てられたフランス・ルネサンス様式の城。「貴婦人の城」とも呼ばれ、ロワール渓谷を代表する名城。"
+      },
+      {
+        name: "カーイト・ベイの要塞",
+        nameEn: "Citadel of Qaitbay",
+        location: "エジプト・アレクサンドリア",
+        coords: [29.8854, 31.2138],
+        wiki: "Citadel_of_Qaitbay",
+        desc: "15世紀にマムルーク朝のスルタン・カーイト・ベイが建設した地中海岸の要塞。古代の七不思議・アレクサンドリアの大灯台の跡地に建つ。"
+      },
+      {
+        name: "ノイシュヴァンシュタイン城",
+        nameEn: "Neuschwanstein Castle",
+        location: "ドイツ・シュヴァンガウ",
+        coords: [10.7498, 47.5576],
+        wiki: "Neuschwanstein_Castle",
+        desc: "19世紀にバイエルン王ルートヴィヒ2世が建てたロマン主義の宮殿。ディズニーの眠れる森の美女の城のモデルとして世界的に有名。"
+      },
+      {
+        name: "ファジル・ゲビ",
+        nameEn: "Fasil Ghebbi",
+        location: "エチオピア・ゴンダール",
+        coords: [37.4673, 12.6030],
+        wiki: "Fasil_Ghebbi",
+        desc: "17世紀にエチオピア皇帝ファシラダスが建設した王宮群。ユネスコ世界遺産に登録されており、「アフリカのカメロット」とも称される。"
+      },
+      {
+        name: "ナハル砦",
+        nameEn: "Nakhal Fort",
+        location: "オマーン・ナハル",
+        coords: [57.8278, 23.3717],
+        wiki: "Nakhal_Fort",
+        desc: "オマーンのハジャル山脈の麓にある古代要塞。岩山の上にそびえ、周囲の温泉とヤシ林が美しいコントラストをなす。"
+      },
+      {
+        name: "姫路城",
+        nameEn: "Himeji Castle",
+        location: "日本・姫路",
+        coords: [134.6939, 34.8394],
+        wiki: "Himeji_Castle",
+        desc: "「白鷺城」の別名を持つ日本の国宝。17世紀初頭に現在の形に整えられ、ユネスコ世界遺産にも登録された日本を代表する城。"
+      },
+      {
+        name: "フレデリクスボー城",
+        nameEn: "Frederiksborg Castle",
+        location: "デンマーク・ヒレレズ",
+        coords: [12.3003, 55.9349],
+        wiki: "Frederiksborg_Castle",
+        desc: "17世紀にクリスチャン4世が建てたオランダ・ルネサンス様式の宮殿。湖に浮かぶような美しい姿で知られ、現在は国立歴史博物館として公開。"
+      },
+      {
+        name: "ペーナ国立宮殿",
+        nameEn: "Pena Palace",
+        location: "ポルトガル・シントラ",
+        coords: [-9.3903, 38.7877],
+        wiki: "Pena_Palace",
+        desc: "19世紀にポルトガル国王フェルナンド2世が建てたロマン主義の宮殿。鮮やかな色彩と折衷様式が特徴で、ユネスコ世界遺産に登録。"
+      },
+      {
+        name: "カステル・デル・モンテ",
+        nameEn: "Castel del Monte",
+        location: "イタリア・アンドリア",
+        coords: [16.2708, 41.0849],
+        wiki: "Castel_del_Monte,_Apulia",
+        desc: "13世紀に神聖ローマ皇帝フリードリヒ2世が建てた八角形の城。幾何学的な完全な対称性を持ち、ユネスコ世界遺産に登録。"
+      },
+      {
+        name: "エディンバラ城",
+        nameEn: "Edinburgh Castle",
+        location: "スコットランド・エディンバラ",
+        coords: [-3.2000, 55.9486],
+        wiki: "Edinburgh_Castle",
+        desc: "死火山のキャッスル・ロックの上に築かれたスコットランドを代表する城塞。スコットランド王冠宝飾品が保管され、ミリタリー・タトゥーの舞台でもある。"
+      }
+    ];
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [20, 30],
+      zoom: 2
+    });
+
+    map.addControl(new maplibregl.NavigationControl());
+
+    async function getWikiImage(wikiTitle) {
+      try {
+        const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function addCastleMarker(castle) {
+      const imgUrl = await getWikiImage(castle.wiki);
+      const fallbackImg = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Gatto_europeo4.jpg/1px-Gatto_europeo4.jpg";
+
+      // マーカー要素作成
+      const el = document.createElement('div');
+      el.className = 'castle-marker';
+      const markerImg = document.createElement('img');
+      markerImg.src = imgUrl || "https://via.placeholder.com/54x54?text=🏰";
+      markerImg.alt = castle.name;
+      el.appendChild(markerImg);
+
+      // ポップアップ作成
+      const popupHTML = `
+        <img class="popup-img" src="${imgUrl || ''}" alt="${castle.name}" onerror="this.style.display='none'">
+        <div class="popup-body">
+          <h3>${castle.name}</h3>
+          <p class="popup-location">📍 ${castle.location}</p>
+          <p>${castle.desc}</p>
+        </div>
+      `;
+
+      const popup = new maplibregl.Popup({ offset: 25, maxWidth: '260px' })
+        .setHTML(popupHTML);
+
+      new maplibregl.Marker({ element: el })
+        .setLngLat(castle.coords)
+        .setPopup(popup)
+        .addTo(map);
+    }
+
+    map.on('load', () => {
+      castles.forEach(castle => addCastleMarker(castle));
+    });
+  </script>
+</body>
+</html>

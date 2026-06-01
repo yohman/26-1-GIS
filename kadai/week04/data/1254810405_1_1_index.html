@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+
+	<title>京都・有名お寺巡りマップ</title>
+
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="1254810405_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810405</div>
+        <div style="font-size:12px;margin-bottom:3px;">柴田　尚槻</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/24 23:03</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/MbejW1OzgRnxQNkG" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810372_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810512_1_1_index4.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<div id="map"></div>
+
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+        // ===== 地図の初期化 =====
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			// 👇 ここを書き換える！（OSMの日本語対応標準スタイル）
+			style: 'https://tiles.openfreemap.org/styles/liberty',  
+			center: [135.7556, 34.9858],  // 初期表示の中心座標 [経度, 緯度]
+			zoom: 11  // 初期ズームレベル
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		const temples = [
+			{
+				name: "清水寺",
+				coords: [135.7850, 34.9949]
+			},
+			{
+				name: "金閣寺（鹿苑寺）",
+				coords: [135.7292, 35.0394]
+			},
+			{
+				name: "伏見稲荷大社",
+				coords: [135.7727, 34.9671]
+			},
+            {
+                name: "銀閣寺（慈照寺）",
+                coords: [135.7980, 35.0268]
+            },
+            {
+                name: "貴船神社",
+                coords: [135.7628, 35.1216]
+            },
+            {
+                name: "八坂神社",
+                coords: [135.7786, 35.0036]
+            },
+            {
+                name: "下鴨神社",
+                coords: [135.7724, 35.0382]
+            }
+		];
+
+
+		// ===== マーカーを自動で一括追加するプログラム =====
+		// 上の「temples」に入れたデータを1つずつ取り出してピンを立てるよ
+		temples.forEach(temple => {
+			new maplibregl.Marker(({ color: "#A52A2A" }))
+				.setLngLat(temple.coords)  // お寺の座標を設定
+				.setPopup(
+					// マーカーをクリックしたときに表示されるポップアップ
+					new maplibregl.Popup()
+						.setHTML(`<h3>${temple.name}</h3><p>京都の有名スポット</p>`)  // お寺の名前を表示
+				)
+				.addTo(map);  // 作成したマーカーを地図に追加
+		});
+
+	</script>
+
+</body>
+
+</html>

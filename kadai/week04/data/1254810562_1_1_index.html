@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Japan Terrain Map</title>
+
+  <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810562</div>
+        <div style="font-size:12px;margin-bottom:3px;">永野　虎太郎</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/19 12:30</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810512_1_1_index4.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810736_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+<script>
+
+const map = new maplibregl.Map({
+  container: 'map',
+
+  style: {
+    version: 8,
+
+    sources: {
+
+      // 国土地理院 標準地図
+      gsi_std: {
+        type: 'raster',
+        tiles: [
+          'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png'
+        ],
+        tileSize: 256,
+        attribution: '国土地理院'
+      },
+
+      // 陰影起伏図（地形がわかりやすい）
+      gsi_relief: {
+        type: 'raster',
+        tiles: [
+          'https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png'
+        ],
+        tileSize: 256,
+        attribution: '国土地理院'
+      }
+    },
+
+    layers: [
+
+      // ベース地図
+      {
+        id: 'std-layer',
+        type: 'raster',
+        source: 'gsi_std'
+      },
+
+      // 地形陰影を重ねる
+      {
+        id: 'relief-layer',
+        type: 'raster',
+        source: 'gsi_relief',
+        paint: {
+          'raster-opacity': 0.45
+        }
+      }
+
+    ]
+  },
+
+  center: [139.7671, 35.6812],
+  zoom: 8
+});
+
+
+// ナビゲーション
+map.addControl(new maplibregl.NavigationControl());
+
+
+// マーカー
+// ===== マーカー地点 =====
+// ===== 地点データ =====
+const locations = [
+
+  {
+    lng: 139.1948,
+    lat: 36.5608,
+    name: "赤城山",
+    description: `
+      群馬を代表する山岳エリア。<br>
+      高速コーナーと長い登りが特徴。<br>
+      路面変化も多く走行データ分析向き。
+    `
+  },
+
+  {
+    lng: 138.7478,
+    lat: 36.3050,
+    name: "妙義山",
+    description: `
+      岩山地形が特徴的。<br>
+      テクニカルコーナーが連続する。<br>
+      道幅が狭くライン取りが重要。
+    `
+  },
+
+  {
+    lng: 138.8705,
+    lat: 36.4769,
+    name: "榛名山",
+    description: `
+      中速コーナー主体。<br>
+      リズムよく走れるワインディング。<br>
+      路面状態が比較的安定している。
+    `
+  },
+
+  {
+    lng: 138.7395,
+    lat: 36.3425,
+    name: "碓氷峠",
+    description: `
+      ヘアピンカーブが有名。<br>
+      標高差と急カーブが多い。<br>
+      ブレーキング技術が重要。
+    `
+  },
+
+  {
+    lng: 139.5007,
+    lat: 36.7380,
+    name: "いろは坂",
+    description: `
+      日光を代表する観光道路。<br>
+      急勾配と連続ヘアピンが特徴。<br>
+      上り下りで性格が大きく変わる。
+    `
+  },
+
+  {
+    lng: 139.0185,
+    lat: 35.2323,
+    name: "箱根峠",
+    description: `
+      高低差の大きい峠道。<br>
+      濃霧や天候変化が多い。<br>
+      高速区間と低速区間が混在する。
+    `
+  },
+
+  {
+    lng: 140.1067,
+    lat: 36.2256,
+    name: "筑波山",
+    description: `
+      コンパクトな峠。<br>
+      タイトコーナーが多い。<br>
+      路面の荒れや落葉に注意。
+    `
+  }
+
+];
+
+
+// ===== マーカー生成 =====
+locations.forEach(loc => {
+
+  new maplibregl.Marker({
+    color: "red"
+  })
+
+    .setLngLat([loc.lng, loc.lat])
+
+    .setPopup(
+      new maplibregl.Popup({
+        offset: 25
+      }).setHTML(`
+        <div style="width:220px;">
+          <h2>${loc.name}</h2>
+          <p>${loc.description}</p>
+        </div>
+      `)
+    )
+
+    .addTo(map);
+
+});
+
+
+// ===== 全地点表示 =====
+const bounds = new maplibregl.LngLatBounds();
+
+locations.forEach(loc => {
+  bounds.extend([loc.lng, loc.lat]);
+});
+
+map.fitBounds(bounds, {
+  padding: 50
+});
+
+</script>
+
+</body>
+
+</html>

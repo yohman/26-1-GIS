@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>僕らの２Dと３D - Full Prototype</title>
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+	
+	<style>
+		body { margin: 0; padding: 0; }
+		#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+		.filter-group {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			z-index: 1;
+			background: rgba(255, 255, 255, 0.9);
+			padding: 15px;
+			border-radius: 5px;
+			box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+			font-family: sans-serif;
+			max-width: 200px;
+		}
+		.filter-group h3 {
+			margin: 10px 0 5px 0;
+			font-size: 14px;
+		}
+		.filter-group h3:first-child {
+			margin-top: 0;
+		}
+		.filter-group label {
+			display: block;
+			margin: 5px 0;
+			cursor: pointer;
+			font-size: 13px;
+		}
+	</style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810512</div>
+        <div style="font-size:12px;margin-bottom:3px;">竹田　圭冴<br><span style='font-size:9px;color:#999;'>タケタ　ケイゴ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/01 18:04</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/YDgnZe189nwbZwrA" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810413_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810562_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+	<div class="filter-group">
+		<h3>1. 役割（大カテゴリ）</h3>
+		<label><input type="checkbox" class="filter-role" value="seichi" checked> 📍 聖地（2D）</label>
+		<label><input type="checkbox" class="filter-role" value="studio" checked> 🏢 作成場所（3D）</label>
+
+		<h3>2. ジャンル（小カテゴリ）</h3>
+		<label><input type="checkbox" class="filter-genre" value="anime" checked> 🎬 オリジナルアニメ</label>
+		<label><input type="checkbox" class="filter-genre" value="comic" checked> 📖 漫画</label>
+		<label><input type="checkbox" class="filter-genre" value="game" checked> 🎮 ゲーム</label>
+	</div>
+
+	<div id="map"></div>
+
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		const map = new maplibregl.Map({
+			container: 'map',
+			style: 'https://demotiles.maplibre.org/style.json',
+			center: [139.75, 35.68],
+			zoom: 5
+		});
+
+		map.addControl(new maplibregl.NavigationControl());
+
+		// ===== 全24箇所のデータソース =====
+		const locations = [
+			// ■ 1. アニメ（オリジナルアニメ限定）
+			{ lng: 139.7005, lat: 35.6895, name: "【聖地】コードギアス（アッシュフォード学園モデル候補 / 新宿御苑）", tags: ["seichi", "anime"] },
+			{ lng: 139.6705, lat: 35.6991, name: "【作成場所】サンライズ / バンダイナムコフィルムワークス（杉並区上荻）", tags: ["studio", "anime"] },
+			{ lng: 139.0837, lat: 35.9926, name: "【聖地】あの花（旧秩父橋 / 埼玉県秩父市）", tags: ["seichi", "anime"] },
+			{ lng: 139.6923, lat: 35.7136, name: "【作成場所】A-1 Pictures（杉並区阿佐谷）", tags: ["studio", "anime"] },
+
+			// ■ 2. 漫画（原作・舞台に特化）
+			{ lng: 139.5786, lat: 35.7486, name: "【聖地】うる星やつら（友引町のモデル / 練馬区大泉学園）", tags: ["seichi", "comic"] },
+			{ lng: 139.0694, lat: 37.9185, name: "【作成場所】高橋留美子先生の出身地（新潟県新潟市）", tags: ["studio", "comic"] },
+			{ lng: 139.4828, lat: 35.3094, name: "【聖地】ピンポン（片瀬高校のモデル / 神奈川県藤沢市・江ノ島）", tags: ["seichi", "comic"] },
+			{ lng: 139.7420, lat: 35.6558, name: "【作成場所】松本大洋先生の所属・小学館（千代田区一ツ橋）", tags: ["studio", "comic"] },
+			{ lng: 141.4655, lat: 43.0454, name: "【聖地】ゴールデンカムイ（北海道開拓の村 / 札幌市）", tags: ["seichi", "comic"] },
+			{ lng: 139.7088, lat: 35.7533, name: "【作成場所】野田サトル先生の所属・集英社（千代田区一ツ橋）", tags: ["studio", "comic"] },
+			{ lng: 140.3189, lat: 35.7765, name: "【聖地】弱虫ペダル（総北高校のモデル / 千葉県立佐倉高校付近）", tags: ["seichi", "comic"] },
+			{ lng: 139.7042, lat: 35.7016, name: "【作成場所】渡辺航先生の所属・秋田書店（千代田区飯田橋）", tags: ["studio", "comic"] },
+			{ lng: 139.7016, lat: 35.6691, name: "【聖地】呪術廻戦（渋谷事変の舞台 / 渋谷駅周辺）", tags: ["seichi", "comic"] },
+			{ lng: 139.7042, lat: 35.7016, name: "【作成場所】芥見下々先生の所属・集英社（千代田区一ツ橋）", tags: ["studio", "comic"] },
+			{ lng: 143.1794, lat: 42.8897, name: "【聖地】銀の匙 Silver Spoon（大蝦夷農業高校モデル / 帯広農業高校）", tags: ["seichi", "comic"] },
+			{ lng: 143.4477, lat: 42.9292, name: "【作成場所】荒川弘先生の出身地（北海道幕別町周辺）", tags: ["studio", "comic"] },
+			{ lng: 139.7111, lat: 35.7261, name: "【聖地】ちいかわ（むちゃうまプリンロケ地候補 / 池袋サンシャイン）", tags: ["seichi", "comic"] },
+			{ lng: 139.6917, lat: 35.7036, name: "【作成場所】ナガノ先生の所属・講談社（文京区音羽）", tags: ["studio", "comic"] },
+
+			// ■ 3. ゲーム
+			{ lng: 138.5681, lat: 35.0116, name: "【聖地】ポケットモンスター 赤・緑（クチバシティモデル / 横浜港）", tags: ["seichi", "game"] },
+			{ lng: 139.7298, lat: 35.6631, name: "【作成場所】ゲームフリーク（港区六本木）", tags: ["studio", "game"] },
+			{ lng: 135.7556, lat: 35.0211, name: "【聖地】ゼルダの伝説（始まりの台地などの着想源 / 京都の山々）", tags: ["seichi", "game"] },
+			{ lng: 135.7511, lat: 34.9696, name: "【作成場所】任天堂 本社（京都市南区）", tags: ["studio", "game"] },
+			{ lng: 138.7278, lat: 35.3606, name: "【聖地】モンスターハンター（ユクモ村等のモデル候補 / 富士山周辺）", tags: ["seichi", "game"] },
+			{ lng: 135.5133, lat: 34.6913, name: "【作成場所】カプコン 本社（大阪市中央区）", tags: ["studio", "game"] },
+			{ lng: 139.7610, lat: 35.6263, name: "【聖地】ソニック（東京ジョイポリス / お台場）", tags: ["seichi", "game"] },
+			{ lng: 139.7297, lat: 35.6517, name: "【作成場所】セガ 本社（品川区西品川）", tags: ["studio", "game"] },
+			{ lng: 139.5211, lat: 35.5925, name: "【聖地】妖怪ウォッチ（さくらニュータウンモデル / 川崎市麻生区）", tags: ["seichi", "game"] },
+			{ lng: 130.4017, lat: 33.5904, name: "【作成場所】レベルファイブ 本社（福岡市博多区）", tags: ["studio", "game"] },
+
+			// ニコニコ本社（爆発用）
+			{ lng: 139.720499, lat: 35.730789, name: "ニコニコ本社", tags: ["seichi", "game"] }
+		];
+
+		let currentMarkers = [];
+		let nicoClickCount = 0;
+
+		function updateMarkers() {
+			currentMarkers.forEach(m => m.remove());
+			currentMarkers = [];
+
+			const checkedRoles = Array.from(document.querySelectorAll('.filter-role:checked')).map(el => el.value);
+			const checkedGenres = Array.from(document.querySelectorAll('.filter-genre:checked')).map(el => el.value);
+
+			locations.forEach(loc => {
+				const hasRole = loc.tags.some(tag => checkedRoles.includes(tag));
+				const hasGenre = loc.tags.some(tag => checkedGenres.includes(tag));
+
+				if (hasRole && hasGenre) {
+					const marker = new maplibregl.Marker()
+						.setLngLat([loc.lng, loc.lat])
+						.setPopup(
+							new maplibregl.Popup().setHTML(`<h3>${loc.name}</h3><p>タグ: ${loc.tags.join(', ')}</p>`)
+						)
+						.addTo(map);
+
+					currentMarkers.push(marker);
+
+					if (loc.name === "ニコニコ本社") {
+						const element = marker.getElement();
+						element.addEventListener("click", () => {
+							nicoClickCount++;
+							if (nicoClickCount === 3) {
+								const explosion = document.createElement("div");
+								explosion.innerHTML = "💥";
+								explosion.style.fontSize = "40px";
+
+								const expMarker = new maplibregl.Marker({ element: explosion })
+									.setLngLat([loc.lng, loc.lat])
+									.addTo(map);
+								
+								currentMarkers.push(expMarker);
+							}
+						});
+					}
+				}
+			});
+		}
+
+		map.on('load', () => {
+			updateMarkers();
+
+			document.querySelectorAll('.filter-role').forEach(checkbox => {
+				checkbox.addEventListener('change', updateMarkers);
+			});
+
+			document.querySelectorAll('.filter-genre').forEach(checkbox => {
+				checkbox.addEventListener('change', updateMarkers);
+			});
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254810182_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810182</div>
+        <div style="font-size:12px;margin-bottom:3px;">柿木　奏太</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/19 21:45</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810174_1_1_好きなラーメン屋ランキング.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810372_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<button id="toggleButton">
+		伊能忠敬日本地図ON/OFF
+	</button>
+
+	<div id="map"></div>
+	</div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: 'https://demotiles.maplibre.org/style.json',  // 地図のデザイン（背景地図）
+			center: [139.7671, 35.6812],  // 初期表示の中心座標 [経度, 緯度]（東京駅）
+			zoom: 2  // 初期ズームレベル（数字が大きいほど拡大）
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		map.on('load', () => {
+
+            map.addSource('japan', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson'
+            });
+
+            map.addLayer({
+                id: 'japan-fill',
+                type: 'fill',
+                source: 'japan',
+
+                paint: {
+                    'fill-color': '#50C878',
+                    'fill-opacity': 0.6
+                }
+            });
+
+			//======　伊能忠敬日本地図　=====
+
+			map.addSource('ino-map',{
+				type: 'image',
+
+				url: 'inou_map.jpg',
+
+				coordinates: [
+					[130.0, 46.5],
+					[146.0, 46.5],
+					[148.0, 29.0],
+					[128.0, 29.0]
+				]
+			});
+
+			map.addLayer({
+				id: 'ino-layer',
+				type: 'raster',
+				source: 'ino-map',
+
+				paint: {
+					'raster-opacity': 0.6
+				}
+			});
+        });
+
+		// ===== マーカーの追加 =====
+		// 地図上にピンを立てる
+		new maplibregl.Marker()
+			.setLngLat([139.7671, 35.6812])  // マーカーの位置 [経度, 緯度]（東京駅）
+			.setPopup(
+				// マーカーをクリックしたときに表示されるポップアップ
+				new maplibregl.Popup()
+					.setHTML("<h3>Tokyo Station</h3><p>行ったことない場所</p>")  // ポップアップの内容（HTML形式）
+			)
+			.addTo(map);  // 作成したマーカーを地図に追加
+
+        new maplibregl.Marker()
+            .setLngLat([139.95625943107925, 35.83435816944088])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML(`
+					    <h3>麗澤大学さつき校舎</h3>
+					
+					    <p>工学部本拠地</p>
+
+						<a href="https://www.reitaku-u.ac.jp/faculty/engineering/"
+						   target="_blank">
+						   麗澤大学工学部HP
+						</a>
+                    `)
+	        )
+            .addTo(map);
+
+		new maplibregl.Marker()
+            .setLngLat([139.96660935202, 35.8389139179084])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML("<h3>新柏駅</h3><p>ここから大学に行く</p>")
+            )
+            .addTo(map);
+
+		new maplibregl.Marker()
+            .setLngLat([139.70378458371516, 35.661822098160265])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML(`
+						<h3>渋谷</h3>
+
+						<iframe
+						    width="200"
+							height="130"
+							src="https://www.youtube.com/embed/RlG4UY6rgqA"
+							title="YouTube video player"
+							frameborder="0"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowfullscreen>
+						</iframe>
+					`)
+            )
+            .addTo(map);
+
+		// ===== 世界時刻マーカー =====
+
+        // 日本
+        new maplibregl.Marker({
+            color: "red"
+        })
+            .setLngLat([139.6917, 35.6895])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML(`
+                        <h3>日本（東京）</h3>
+                        <p id="tokyo-time"></p>
+                    `)
+            )
+            .addTo(map);
+
+        // アメリカ
+        new maplibregl.Marker({
+            color: "blue"
+        })
+            .setLngLat([-77.0369, 38.9072])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML(`
+                        <h3>アメリカ</h3>
+                        <p id="usa-time"></p>
+                    `)
+            )
+            .addTo(map);
+
+        // イギリス
+        new maplibregl.Marker({
+            color: "green"
+        })
+            .setLngLat([-0.1276, 51.5072])
+            .setPopup(
+                new maplibregl.Popup()
+                    .setHTML(`
+                        <h3>イギリス</h3>
+                        <p id="uk-time"></p>
+                    `)
+            )
+            .addTo(map);
+
+        // ===== 世界時刻更新 =====
+
+        setInterval(() => {
+
+            const tokyo = new Date().toLocaleString("ja-JP", {
+                timeZone: "Asia/Tokyo"
+            });
+
+            const usa = new Date().toLocaleString("en-US", {
+                timeZone: "America/New_York"
+            });
+
+            const uk = new Date().toLocaleString("en-GB", {
+                timeZone: "Europe/London"
+            });
+
+            const tokyoElement = document.getElementById("tokyo-time");
+            if(tokyoElement){
+                tokyoElement.innerHTML = "現在時刻: " + tokyo;
+            }
+
+            const usaElement = document.getElementById("usa-time");
+            if(usaElement){
+                usaElement.innerHTML = "Current Time: " + usa;
+            }
+
+            const ukElement = document.getElementById("uk-time");
+            if(ukElement){
+                ukElement.innerHTML = "Current Time: " + uk;
+            }
+
+        }, 1000);
+
+		//=====　伊能忠敬　ON/OFF　=====
+		let inoVisible = true;
+
+		document.getElementById("toggleButton").addEventListener("click", () => {
+            inoVisible = !inoVisible;
+
+			map.setLayoutProperty(
+				'ino-layer',
+				'visibility',
+				inoVisible ? 'visible' : 'none'
+			);
+		});
+
+	</script>
+
+</body>
+
+</html>

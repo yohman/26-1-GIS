@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>School Travel Map</title>
+
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+	<link rel="stylesheet" href="1254510865_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510865</div>
+        <div style="font-size:12px;margin-bottom:3px;">佐藤　太陽</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/26 09:55</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/e9YpQNpMYoB1WxjM" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254510534_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254511524_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- タイトル -->
+	<h1 class="title">自分の思い出旅行マップ🚗（高校時🔵大学時🔴）</h1>
+
+	<!-- ボタン -->
+	<div class="buttons">
+		<button onclick="moveOsaka()">🔴 大阪</button>
+		<button onclick="moveFukuoka()">🔴 福岡</button>
+		<button onclick="moveShizuoka()">🔵 静岡</button>
+		<button onclick="moveKanagawa()">🔴 神奈川</button>
+		<button onclick="moveGunma()">🔵 群馬</button>
+	</div>
+
+	<!-- 地図 -->
+	<div id="map"></div>
+
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+
+		// 地図作成
+		const map = new maplibregl.Map({
+			container: 'map',
+
+			// ダークマップ
+			style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+
+			center: [137.5, 36.0],
+			zoom: 5
+		});
+
+		// ズームボタン
+		map.addControl(new maplibregl.NavigationControl());
+
+		// 旅行データ
+		const travelSpots = [
+
+			{
+				lng: 135.5023,
+				lat: 34.6937,
+				name: "大阪",
+				comment: "大学生の時に友達と行った思い出の場所！",
+				rank: "★★★★★",
+				rankComment: "ご飯も雰囲気も最高！",
+				link: "https://www.google.com/maps/dir/浦安駅/大阪駅"
+			},
+
+			{
+				lng: 130.4017,
+				lat: 33.5904,
+				name: "福岡",
+				comment: "博多ラーメンがめっちゃ美味しかった！",
+				rank: "★★★★☆",
+				rankComment: "また行きたい！",
+				link: "https://www.google.com/maps/dir/浦安駅/博多駅"
+			},
+
+			{
+				lng: 138.3831,
+				lat: 34.9769,
+				name: "静岡",
+				comment: "高校の友達と行った思い出の場所！",
+				rank: "★★★★★",
+				rankComment: "富士山が綺麗すぎた！",
+				link: "https://www.google.com/maps/dir/浦安駅/静岡駅"
+			},
+
+			{
+				lng: 139.6425,
+				lat: 35.4478,
+				name: "神奈川",
+				comment: "夜景がめっちゃ綺麗だった！",
+				rank: "★★★★☆",
+				rankComment: "景色が最高！",
+				link: "https://www.google.com/maps/dir/浦安駅/横浜駅"
+			},
+
+			{
+				lng: 139.0608,
+				lat: 36.3911,
+				name: "群馬",
+				comment: "温泉でゆっくりできた！",
+				rank: "★★★☆☆",
+				rankComment: "自然が多くて落ち着く！",
+				link: "https://www.google.com/maps/dir/浦安駅/高崎駅"
+			}
+
+		];
+
+		// マーカー追加
+		travelSpots.forEach(spot => {
+
+			let markerColor;
+
+			// 赤 = 大学生
+			if (
+				spot.name === "大阪" ||
+				spot.name === "福岡" ||
+				spot.name === "神奈川"
+			) {
+				markerColor = "red";
+			}
+
+			// 青 = 高校
+			else {
+				markerColor = "blue";
+			}
+
+			new maplibregl.Marker({ color: markerColor })
+
+				.setLngLat([spot.lng, spot.lat])
+
+				.setPopup(
+
+					new maplibregl.Popup()
+
+						.setHTML(`
+
+							<h2>${spot.name}</h2>
+
+							<p>${spot.comment}</p>
+
+							<p class="rank">
+								⭐ 好き度：${spot.rank}
+							</p>
+
+							<p>${spot.rankComment}</p>
+
+							<a href="${spot.link}" target="_blank">
+								🚗 浦安駅から車で行く
+							</a>
+
+						`)
+
+				)
+
+				.addTo(map);
+
+		});
+
+		// ボタン移動
+		function moveOsaka() {
+			map.flyTo({
+				center: [135.5023, 34.6937],
+				zoom: 11
+			});
+		}
+
+		function moveFukuoka() {
+			map.flyTo({
+				center: [130.4017, 33.5904],
+				zoom: 11
+			});
+		}
+
+		function moveShizuoka() {
+			map.flyTo({
+				center: [138.3831, 34.9769],
+				zoom: 11
+			});
+		}
+
+		function moveKanagawa() {
+			map.flyTo({
+				center: [139.6425, 35.4478],
+				zoom: 11
+			});
+		}
+
+		function moveGunma() {
+			map.flyTo({
+				center: [139.0608, 36.3911],
+				zoom: 11
+			});
+		}
+
+	</script>
+
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サイバー攻撃マップ - Souta Kakinoki　柿木奏太</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 60px 20px 20px 20px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .author {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .description {
+            font-size: 14px;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+            background: #f5f5f5;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .url {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .url a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .url a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div style="position:fixed;top:20px;right:20px;display:flex;gap:5px;z-index:9999;"><a href="entry_26.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="entry_28.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div>
+    
+    <div class="container">
+        <h1>サイバー攻撃マップ</h1>
+        <div class="author">by Souta Kakinoki　柿木奏太 (1254810182)</div>
+        
+        <div id="content-container" style="margin-bottom:20px;">
+    <img src="https://storage.googleapis.com/padlet-uploads-usc1/3700450746/4348c259f3a7bd19efae86aaf77c44f9/__________2026_04_28_15_35_09.png?Expires=1779688128&amp;GoogleAccessId=778043051564-q79bsd8mc40b0bl82ikkrtc3jdofe4dg%40developer.gserviceaccount.com&amp;Signature=GjdWaAIdacWNPAbgUGk%2FPtv%2Fef0XI1qjn1ef5bdcPt0lFeWtmHdREqVCinuK2eT%2FAc1MQRDlphZvgUOTID78NDwzcF0K%2BSLrZjvtWrBlkvY5faemUuzPDCp8BMyDefmwa68C30Ka8SKxJgIEDVqpsXxm3IYhH%2BEF9Md%2BHT2w1rA%3D&amp;original-url=https%3A%2F%2Fpadlet-uploads-usc1.storage.googleapis.com%2F3700450746%2F4348c259f3a7bd19efae86aaf77c44f9%2F__________2026_04_28_15_35_09.png" style="max-width:100%;height:auto;border:2px solid #000;" alt="Screenshot">
+    <div style="background:#f0f0f0;padding:10px;border:2px solid #000;margin-top:10px;font-size:12px;">
+        <button onclick="tryEmbed()" style="background:#000;color:#fff;border:none;padding:8px 16px;font-family:'Courier New',monospace;cursor:pointer;font-size:12px;">▶ Try to embed website</button>
+        <span style="margin-left:10px;color:#666;">May not work if the website blocks embedding</span>
+    </div>
+</div>
+<script>
+function tryEmbed() {
+    var container = document.getElementById('content-container');
+    var embedUrl = "https://cybermap.kaspersky.com/";
+    var fallbackUrl = "https://storage.googleapis.com/padlet-uploads-usc1/3700450746/4348c259f3a7bd19efae86aaf77c44f9/__________2026_04_28_15_35_09.png?Expires=1779688128&GoogleAccessId=778043051564-q79bsd8mc40b0bl82ikkrtc3jdofe4dg%40developer.gserviceaccount.com&Signature=GjdWaAIdacWNPAbgUGk%2FPtv%2Fef0XI1qjn1ef5bdcPt0lFeWtmHdREqVCinuK2eT%2FAc1MQRDlphZvgUOTID78NDwzcF0K%2BSLrZjvtWrBlkvY5faemUuzPDCp8BMyDefmwa68C30Ka8SKxJgIEDVqpsXxm3IYhH%2BEF9Md%2BHT2w1rA%3D&original-url=https%3A%2F%2Fpadlet-uploads-usc1.storage.googleapis.com%2F3700450746%2F4348c259f3a7bd19efae86aaf77c44f9%2F__________2026_04_28_15_35_09.png";
+    
+    container.innerHTML = '<iframe id="embed-iframe" src="' + embedUrl + '" style="width:100%;height:600px;border:2px solid #000;"></iframe>' +
+        '<div style="background:#f0f0f0;padding:10px;border:2px solid #000;margin-top:10px;font-size:12px;">' +
+        '<button onclick="showScreenshot()" style="background:#000;color:#fff;border:none;padding:8px 16px;font-family:'Courier New',monospace;cursor:pointer;font-size:12px;">◀ Back to screenshot</button>' +
+        '</div>';
+}
+
+function showScreenshot() {
+    var container = document.getElementById('content-container');
+    var fallbackUrl = "https://storage.googleapis.com/padlet-uploads-usc1/3700450746/4348c259f3a7bd19efae86aaf77c44f9/__________2026_04_28_15_35_09.png?Expires=1779688128&GoogleAccessId=778043051564-q79bsd8mc40b0bl82ikkrtc3jdofe4dg%40developer.gserviceaccount.com&Signature=GjdWaAIdacWNPAbgUGk%2FPtv%2Fef0XI1qjn1ef5bdcPt0lFeWtmHdREqVCinuK2eT%2FAc1MQRDlphZvgUOTID78NDwzcF0K%2BSLrZjvtWrBlkvY5faemUuzPDCp8BMyDefmwa68C30Ka8SKxJgIEDVqpsXxm3IYhH%2BEF9Md%2BHT2w1rA%3D&original-url=https%3A%2F%2Fpadlet-uploads-usc1.storage.googleapis.com%2F3700450746%2F4348c259f3a7bd19efae86aaf77c44f9%2F__________2026_04_28_15_35_09.png";
+    
+    container.innerHTML = '<img src="' + fallbackUrl + '" style="max-width:100%;height:auto;border:2px solid #000;" alt="Screenshot">' +
+        '<div style="background:#f0f0f0;padding:10px;border:2px solid #000;margin-top:10px;font-size:12px;">' +
+        '<button onclick="tryEmbed()" style="background:#000;color:#fff;border:none;padding:8px 16px;font-family:'Courier New',monospace;cursor:pointer;font-size:12px;">▶ Try to embed website</button>' +
+        '<span style="margin-left:10px;color:#666;">May not work if the website blocks embedding</span>' +
+        '</div>';
+}
+</script>
+        
+        <div class="url">
+            <a href="https://cybermap.kaspersky.com/" target="_blank">View Web Map →</a>
+        </div>
+        
+        <div class="description">
+            リンク：<br>https://cybermap.kaspersky.com/<br><br>改善：ズーム、ズームアウトがしにくい<br>良い：とある企業がサイバー攻撃にあって犯人を探すとなってもどこからの攻撃なのかがわからないと操作が難航する可能性があるのでそこは良いポイント。<br>ヒント：セキュリティのことをやるのに古い情報だとあまり意味がないので、リアルタイムで更新をする地図を作りたい自分としてはそこはヒントになると思った。
+        </div>
+    </div>
+</body>
+</html>

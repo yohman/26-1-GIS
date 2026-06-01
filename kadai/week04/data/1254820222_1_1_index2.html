@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254820222_1_2_style.css">
+
+	<!-- ページ内の簡易スタイル: マーカーの見た目と地図領域 -->
+	<style>
+		/* 地図コンテナをフルスクリーン表示 */
+		#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+		/* マーカースタイル共通 */
+		.marker { display: block; border-radius: 50%; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.5); transform: translate(-50%, -50%); }
+
+		/* 過去開催地（小さいグレー） */
+		.marker.past { width: 14px; height: 14px; background: #7f8c8d; border: 2px solid #ffffff; }
+
+		/* 今後開催地（大きく目立つ赤） */
+		.marker.upcoming { width: 24px; height: 24px; background: #e74c3c; border: 3px solid #ffd54f; }
+
+		/* 凡例 */
+		#legend { position: absolute; left: 10px; bottom: 10px; background: rgba(255,255,255,0.9); padding: 8px 10px; border-radius: 6px; font-family: sans-serif; font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+		#legend .item { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+		#legend .dot { width:14px; height:14px; border-radius:50%; }
+		#legend .dot.upcoming { width:18px; height:18px; background:#e74c3c; border:2px solid #ffd54f; }
+		#legend .dot.past { background:#7f8c8d; border:2px solid #fff; }
+
+		/* MapLibre のデフォルトピン（アイコン）が重なって見える場合は非表示にする */
+		/* これによりカスタム要素（上の .marker）だけが見えるようになります */
+		.maplibregl-marker {
+			background: none !important;
+			background-image: none !important;
+			width: auto !important;
+			height: auto !important;
+			padding: 0 !important;
+			border: none !important;
+		}
+		.maplibregl-marker img { display: none !important; }
+	</style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254820222</div>
+        <div style="font-size:12px;margin-bottom:3px;">神戸　宗一郎</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/26 09:59</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/yEPVZkoxNlB2Zb0Y" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810992_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510435_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<div id="map"></div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: 'https://demotiles.maplibre.org/style.json',  // 地図のデザイン（背景地図）
+			center: [139.7671, 35.6812],  // 初期表示の中心座標 [経度, 緯度]（東京駅）
+			zoom: 4  // 初期ズームレベル（数字が大きいほど拡大）
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		// ===== マーカー群の定義 =====
+		// ここでは例としてサンプルの過去開催地と今後開催地を設定しています。
+		// 実際の座標・名称に差し替えてください。
+		const upcomingLocations = [
+			{ name: 'MC Battle — Osaka (Upcoming)', coords: [135.5023, 34.6937], date: '2026-06-15' },
+			{ name: 'MC Battle — Fukuoka (Upcoming)', coords: [130.4017, 33.5902], date: '2026-07-03' }
+		];
+
+		const pastLocations = [
+			{ name: 'MC Battle — Tokyo (Past)', coords: [139.6917, 35.6895], date: '2025-11-12' },
+			{ name: 'MC Battle — Nagoya (Past)', coords: [136.9066, 35.1815], date: '2025-08-21' },
+			{ name: 'MC Battle — Sapporo (Past)', coords: [141.3545, 43.0621], date: '2024-12-01' }
+		];
+
+		// マーカーを作るユーティリティ
+		function createMarker(location, type = 'past') {
+			const el = document.createElement('div');
+			el.className = `marker ${type}`;
+			// 高優先度のマーカー（upcoming）は手動で高いz-indexを与えて常に上に表示
+			if (type === 'upcoming') el.style.zIndex = 1000;
+
+			const popupHtml = `<strong>${location.name}</strong><br/>${location.date ? location.date : ''}`;
+
+			new maplibregl.Marker(el)
+				.setLngLat(location.coords)
+				.setPopup(new maplibregl.Popup({ offset: 12 }).setHTML(popupHtml))
+				.addTo(map);
+		}
+
+		// まず過去開催地を表示（背景的に）
+		pastLocations.forEach(loc => createMarker(loc, 'past'));
+
+		// 次に、優先的に表示したい今後開催地を追加（見た目を大きくして上に重ねる）
+		upcomingLocations.forEach(loc => createMarker(loc, 'upcoming'));
+
+		// 今後開催地があれば最初の1件にフォーカスして表示（優先表示）
+		if (upcomingLocations.length > 0) {
+			map.flyTo({ center: upcomingLocations[0].coords, zoom: 6, speed: 0.8 });
+		}
+
+		// 凡例を追加
+		const legend = document.createElement('div');
+		legend.id = 'legend';
+		legend.innerHTML = `
+			<div style="font-weight:600; margin-bottom:6px;">MC Battle Locations</div>
+			<div class="item"><span class="dot upcoming"></span> Upcoming (priority)</div>
+			<div class="item"><span class="dot past"></span> Past</div>
+		`;
+		document.body.appendChild(legend);
+
+	</script>
+
+</body>
+
+</html>

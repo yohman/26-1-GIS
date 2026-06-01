@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254810059_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810059</div>
+        <div style="font-size:12px;margin-bottom:3px;">粟野　翔</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/20 14:26</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/jpoxajkmg7OKQbPE" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254690435_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810075_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<div id="map"></div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: {
+		version: 8,
+		sources: {
+
+			satellite: {
+				type: 'raster',
+				tiles: [
+					'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+				],
+				tileSize: 256,
+				attribution: '© Esri'
+			}
+
+		},
+
+		layers: [
+			{
+				id: 'satellite',
+				type: 'raster',
+				source: 'satellite'
+			}
+		]
+	},
+
+	center: [140.1798, 36.0811],
+	zoom: 13
+});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		map.on('load', () => {
+
+	map.addSource('route', {
+		type: 'geojson',
+		data: {
+			type: 'Feature',
+			geometry: {
+				type: 'LineString',
+				coordinates: [
+
+					// 土浦駅
+					[140.2060, 36.0785],
+
+					// 楽市楽座
+					[140.17983010190224, 36.08110039948219]
+
+				]
+			}
+		}
+	});
+
+	map.addSource('pink-route', {
+	type: 'geojson',
+	data: {
+		type: 'Feature',
+		geometry: {
+			type: 'LineString',
+			coordinates: [
+
+				// 土浦駅
+				[140.2060, 36.0785],
+
+				// ピンクパンサー
+				[140.2153258629781, 36.10681960807715]
+
+			]
+		}
+	}
+});
+
+map.addSource('GiGO-route', {
+	type: 'geojson',
+	data: {
+		type: 'Feature',
+		geometry: {
+			type: 'LineString',
+			coordinates: [
+
+				// 土浦駅
+				[140.2060, 36.0785],
+
+				// GIGoデイズタウンつくば
+				[140.11496205085268, 36.07851341592253]
+
+			]
+		}
+	}
+});
+
+
+
+map.addLayer({
+	id: 'pink-route-line',
+	type: 'line',
+	source: 'pink-route',
+	paint: {
+		'line-color': '#0000ff',
+		'line-width': 5
+	}
+});
+	map.addLayer({
+		id: 'route-line',
+		type: 'line',
+		source: 'route',
+		paint: {
+			'line-color': '#ff0000',
+			'line-width': 5
+		}
+	});
+
+	map.addLayer({
+	id: 'GiGO-route-line',
+	type: 'line',
+	source: 'GiGO-route',
+	paint: {
+		'line-color': '#ffff00',
+		'line-width': 5
+	}
+});
+
+});
+
+
+		
+
+		// ===== マーカーの追加 =====
+
+
+
+			const locations = [
+				{ lng: 140.2061805433211, lat: 36.078514418055896, name: "土浦駅"},
+				
+
+  { lng: 139.7671, lat: 35.6812, name: "東京駅" },
+  { lng: 135.7586, lat: 34.9855, name: "京都駅" },
+  { lng: 141.3545, lat: 43.0687, name: "札幌駅" },
+{ lng: 130.4181, lat: 33.6064, name: "福岡駅" },
+{ lng: 126.9780, lat: 37.5665, name: "ソウル" },
+{ lng: 116.4074, lat: 39.9042, name: "北京" },
+{ lng: 103.8198, lat: 1.3521, name: "シンガポール" },
+{ lng: 151.2093, lat: -33.8688, name: "シドニー" },
+{ lng: -0.1276, lat: 51.5074, name: "ロンドン" },
+  { lng: -118.2437, lat: 34.0522, name: "ロサンゼルス" },
+ 
+
+  {
+    lng: 140.17983010190224,
+    lat: 36.08110039948219,
+    name: "楽市楽座 イオンモール土浦店",
+    station: "土浦駅",
+    time: "バス約10分"
+  },
+  {
+  lng: 140.2153258629781,
+  lat: 36.10681960807715,
+  name: "ピンクパンサー 土浦店",
+  station: "土浦駅",
+  time: "車約10分"
+},
+{
+  lng: 140.11496205085268,
+  lat: 36.07851341592253,
+  name: "GiGOデイズタウンつくば",
+  time: "車約19分"
+}
+
+  
+
+];
+
+locations.forEach(loc => {
+
+  // 土浦駅だけ赤
+  if (loc.name === "土浦駅") {
+
+    new maplibregl.Marker({
+      color: "red"
+    })
+      .setLngLat([loc.lng, loc.lat])
+      .setPopup(
+        new maplibregl.Popup().setHTML(`
+          <h3>${loc.name}</h3>
+        `)
+      )
+      .addTo(map);
+
+  }
+
+  // それ以外
+  else {
+
+    let popupHTML = `<h3>${loc.name}</h3>`;
+
+    if (loc.station) {
+      popupHTML += `<p>最寄駅: ${loc.station}</p>`;
+    }
+
+    if (loc.time) {
+      popupHTML += `<p>${loc.time}</p>`;
+    }
+
+    new maplibregl.Marker()
+      .setLngLat([loc.lng, loc.lat])
+      .setPopup(
+        new maplibregl.Popup().setHTML(popupHTML)
+      )
+      .addTo(map);
+
+  }
+
+});
+
+	</script>
+
+</body>
+
+</html>

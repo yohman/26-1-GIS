@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sri Lanka UNESCO Map</title>
+
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+    <style>
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 10px;
+            background: #0b5d3b;
+            color: white;
+            padding: 12px;
+        }
+
+        #container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        #map {
+            width: 75%;
+            height: 100%;
+        }
+
+        #sidebar {
+            width: 25%;
+            padding: 15px;
+            background: white;
+            border-left: 2px solid #ccc;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        #sidebar img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar h2 {
+            color: #0b5d3b;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254690435</div>
+        <div style="font-size:12px;margin-bottom:3px;">ＰＥＲＥＲＡ　ＭＥＶＥＮＳＴＥＥＶＥ</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/24 22:52</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254690352_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810059_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+    <h1>Sri Lanka UNESCO World Heritage Sites</h1>
+
+    <div id="container">
+
+        <div id="map"></div>
+
+        <div id="sidebar">
+
+            <h2 id="title">Click a marker</h2>
+
+            <img id="img" src="">
+
+            <p id="desc">Select a UNESCO site to view details.</p>
+
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+    <script>
+
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json',
+            center: [80.7718, 7.8731],
+            zoom: 7
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+
+        function showSite(site) {
+            document.getElementById("title").innerText = site.name;
+            document.getElementById("img").src = site.img;
+            document.getElementById("desc").innerText = site.desc;
+        }
+
+        const locations = [
+
+            {
+                name: "Sacred City of Anuradhapura",
+                lng: 80.4037,
+                lat: 8.3114,
+                img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Jetavanaramaya_Stupa_profile.jpg/1920px-Jetavanaramaya_Stupa_profile.jpg",
+                desc: "This is one of the oldest continuously inhabited cities in the world and the first great capital of ancient Sri Lanka. It feels like a massive open-air museum filled with giant stupas, monasteries, and sacred ruins. The most special feature is the Sri Maha Bodhi tree, believed to be grown from a cutting of the original tree under which Buddha attained enlightenment. Walking here feels like stepping into the spiritual heart of ancient Buddhism."
+            },
+
+            {
+                name: "Ancient City of Polonnaruwa",
+                lng: 81.0000,
+                lat: 7.9403,
+                img: "https://www.chamilatours.com/wp-content/uploads/2022/11/ancient-city-of-polonnaruwa.jpg",
+                desc: "Polonnaruwa was a medieval capital of Sri Lanka and is much more compact and easier to explore than Anuradhapura. It is famous for its beautifully carved stone Buddha statues at Gal Vihara and well-preserved ruins of palaces and temples. It feels like an ancient city frozen in time, especially great to explore by bicycle."
+            },
+
+            {
+                name: "Ancient City of Sigiriya (Lion Rock)",
+                lng: 80.7603,
+                lat: 7.9570,
+                img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Sigiriya.jpg",
+                desc: "Sigiriya is one of the most iconic landmarks in Asia — a massive rock fortress rising out of the jungle. Built in the 5th century, it was once a royal palace on top of the rock. You can still see ancient frescoes, landscaped gardens, and the famous “mirror wall” with old graffiti. Climbing it gives you both history and breathtaking views."
+            },
+
+            {
+                name: "Sacred City of Kandy",
+                lng: 80.6413,
+                lat: 7.2936,
+                img: "https://www.honeymoonguidesrilanka.com/wp-content/uploads/2024/07/Romantic-Escapades-in-Kandy-1920x600-1.jpg",
+                desc: "Kandy was the last royal capital of Sri Lanka and is still one of the most sacred cities in Buddhism. Its center is the Temple of the Tooth Relic, believed to hold a tooth of the Buddha. The city is surrounded by hills and hosts grand festivals like the Esala Perahera, filled with dancers, elephants, and music."
+            },
+
+            {
+                name: "Old Town of Galle and its Fortifications",
+                lng: 80.2170,
+                lat: 6.0269,
+                img: "https://do6raq9h04ex.cloudfront.net/sites/8/2021/07/galle-fort-1050x700-1.jpg",
+                desc: "Galle is a beautiful coastal fort city built by the Portuguese and later developed by the Dutch. Inside the fort, you’ll find colonial-style streets, cafés, churches, and ocean views. It’s one of the best places where European colonial history blends with Sri Lankan culture."
+            },
+
+            {
+                name: "Rangiri Dambulla Cave Temple",
+                lng: 80.6490,
+                lat: 7.8567,
+                img: "https://www.lovesrilanka.org/wp-content/uploads/2020/04/LS_Desktop_1920x700-4.jpg",
+                desc: "This is a stunning temple complex inside a giant rock. It contains five caves filled with Buddha statues and ancient wall paintings that are over 2,000 years old. It still functions as a place of worship, and the mix of art, religion, and natural cave formations makes it feel deeply peaceful and timeless."
+            },
+
+            {
+                name: "Sinharaja Forest Reserve",
+                lng: 80.4570,
+                lat: 6.4000,
+                img: "https://www.lugaresincertos.com/wp-content/uploads/2025/01/Imagem-aerea-Por-do-sol-Floresta-de-Sinharaja-sri-lanka-jorge-duarte-estevao-1170-x768.jpg",
+                desc: "Sinharaja is Sri Lanka’s last major primary tropical rainforest and one of the most biologically unique places on Earth. Many of its plants and animals exist nowhere else. Walking through it feels like entering a living green world full of birds, insects, and dense rainforest life."
+            },
+
+            {
+                name: "Central Highlands of Sri Lanka",
+                lng: 80.7700,
+                lat: 6.8400,
+                img: "https://www.lanka-excursions-holidays.com/uploads/4/0/2/1/40216937/frotoft-dscf2323-1560panoramic_orig.jpg",
+                desc: "This site includes high mountain areas like Horton Plains, Peak Wilderness, and Knuckles Range. It is a cool, misty region full of cloud forests, waterfalls, rare wildlife, and tea plantations. It is also a major biodiversity hotspot, especially for endemic species."
+            }
+
+        ];
+
+        locations.forEach(site => {
+
+            const marker = new maplibregl.Marker()
+                .setLngLat([site.lng, site.lat])
+                .addTo(map);
+
+            marker.getElement().addEventListener("click", () => {
+                showSite(site);
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254511912_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254511912</div>
+        <div style="font-size:12px;margin-bottom:3px;">金澤　一華</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/22 16:39</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/L8KjW9vK0MMoaJbv" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254511524_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254512134_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<div id="map"></div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: 'https://demotiles.maplibre.org/style.json',  // 地図のデザイン（背景地図）
+			center: [-118.2437, 34.0522],  // 初期表示の中心座標 [経度, 緯度]（東京駅）
+			zoom: 7  // 初期ズームレベル（数字が大きいほど拡大）
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		// ===== マーカーの追加 =====
+		// 地図上にピンを立てる
+		new maplibregl.Marker()
+			.setLngLat([-118.2437, 34.0522])  // マーカーの位置 [経度, 緯度]（東京駅）
+			.setPopup(
+				// マーカーをクリックしたときに表示されるポップアップ
+				new maplibregl.Popup()
+					.setHTML("<h3>Los Angeles</h3><p>A place full of memories for me</p>")  // ポップアップの内容（HTML形式）
+			)
+			.addTo(map);  // 作成したマーカーを地図に追加
+
+
+	const locations = [
+  { lng: -117.162, lat: 32.715, name: "San Diego" },
+  { lng: -117.88278, lat: 33.80028, name: "Angel Stadium of Anaheim" },
+  { lng: -116.999412, lat: 32.646904, name: "Bonita Vista high school" },
+  { lng: -118.491, lat: 34.019, name: "Santa Monica" },
+  { lng: -117.919000, lat: 33.8099000, name: "Disney California Adventure & Disneyland Park " },
+  { lng: -118.356051, lat: 34.136518, name: "Universal Studios Hollywood" },
+];
+
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-117.162, 32.715])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>San Diego</h3><p>The place I stayed during my homestay</p>`)
+    )
+    .addTo(map);
+});
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-117.88278, 33.80028])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>Angel Stadium of Anaheim</h3><p>Ohtani!!!</p>`)
+    )
+    .addTo(map);
+});
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-116.999412, 32.646904])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>Bonita Vista high school</h3><p>The place where Istudied abroad for two weeks</p>`)
+    )
+    .addTo(map);
+});
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-118.491, 34.019])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>Santa Monica</h3><p>Beautiful beach</p>`)
+    )
+    .addTo(map);
+});
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-117.919000, 33.8099000])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>Disney California Adventure & Disneyland Park</h3><p>I didn't have enough time... </p>`)
+    )
+    .addTo(map);
+});
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([-118.356051, 34.136518])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>Universal Studios Hollywood</h3><p>It was huge</p>`)
+    )
+    .addTo(map);
+});
+</script>
+
+</body>
+
+</html>
+

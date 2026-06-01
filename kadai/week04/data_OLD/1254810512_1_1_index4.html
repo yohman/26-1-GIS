@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254810512_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810512</div>
+        <div style="font-size:12px;margin-bottom:3px;">竹田　圭冴</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/25 08:53</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810405_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810562_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<div id="map"></div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: 'https://demotiles.maplibre.org/style.json',  // 地図のデザイン（背景地図）
+			center: [0,0],  // 初期表示の中心座標 [経度, 緯度]（東京駅）
+			zoom: 1  // 初期ズームレベル（数字が大きいほど拡大）
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		// ===== マーカーの追加 =====
+		// 地図上にピンを立てる
+		new maplibregl.Marker()
+			.setLngLat([0,0])  // マーカーの位置 [経度, 緯度]（東京駅）
+			.setPopup(
+				// マーカーをクリックしたときに表示されるポップアップ
+				new maplibregl.Popup()
+					.setHTML("<h3>all 0point</h3><p>kokogahitogakimetazeroda</p>")  // ポップアップの内容（HTML形式）
+			)
+			.addTo(map);  // 作成したマーカーを地図に追加
+
+			// ===== 複数マーカーの追加 =====
+// ===== 複数マーカーの追加 =====
+const locations = [
+  { lng: 143.447707, lat: 42.929279 , name: "島本和彦さんの出身地" },
+  { lng: 139.720499, lat: 35.730789, name: "ニコニコ本社" },
+  { lng: 139.069444, lat: 37.918535, name: "高橋留美子さんの出身地" }
+];
+
+// ニコニコ本社クリック回数
+let nicoClickCount = 0;
+
+// 配列を順番に処理してマーカーを追加
+locations.forEach(loc => {
+
+  // マーカー作成
+  const marker = new maplibregl.Marker()
+    .setLngLat([loc.lng, loc.lat])
+    .setPopup(
+      new maplibregl.Popup()
+        .setHTML(`<h3>${loc.name}</h3>`)
+    )
+    .addTo(map);
+
+  // ニコニコ本社だけ特殊処理
+  if (loc.name === "ニコニコ本社") {
+
+    // マーカー要素を取得
+    const element = marker.getElement();
+
+    // クリックイベント
+    element.addEventListener("click", () => {
+
+      nicoClickCount++;
+
+      console.log("ニコニコ本社クリック数:", nicoClickCount);
+
+      // 3回クリックしたら爆発
+      if (nicoClickCount === 3) {
+
+        // 爆発用HTML要素
+        const explosion = document.createElement("div");
+        explosion.innerHTML = "💥";
+        explosion.style.fontSize = "40px";
+
+        // 爆発マーカーを追加
+        new maplibregl.Marker({
+          element: explosion
+        })
+          .setLngLat([loc.lng, loc.lat])
+          .addTo(map);
+      }
+    });
+  }
+});
+
+// 配列を順番に処理してマーカーを追加
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([loc.lng, loc.lat])
+    .setPopup(
+      new maplibregl.Popup()
+        .setHTML(`<h3>${loc.name}</h3>`)
+    )
+    .addTo(map);
+});
+	</script>
+
+</body>
+
+</html>
+

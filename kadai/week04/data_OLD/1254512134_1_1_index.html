@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>柏駅周辺のポストマップ</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body { margin: 0; }
+        #map { height: 100vh; width: 100%; background-color: #f0f0f0; }
+        .google-style-pin { filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
+    </style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254512134</div>
+        <div style="font-size:12px;margin-bottom:3px;">荒井　聡</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/23 16:32</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254511912_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254690352_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // 柏市全体が見える位置に設定
+        const map = L.map('map').setView([35.8580, 139.9680], 13);
+
+        // カラーの地図タイル（Esri World Street Map）
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
+        }).addTo(map);
+
+        // 1. 柏市の境界データを取得し、市外をマスク（切り抜き）
+        const boundaryQuery = '[out:json];relation["name"="柏市"]["admin_level"="7"];out geom;';
+        const boundaryUrl = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(boundaryQuery);
+
+        fetch(boundaryUrl)
+            .then(res => res.json())
+            .then(data => {
+                const cityCoords = [];
+
+                if (data.elements) {
+                    const relation = data.elements.find(el => el.type === 'relation' && el.geometry);
+                    if (relation && relation.geometry) {
+                        cityCoords.push(relation.geometry.map(g => [g.lat, g.lon]));
+                    } else {
+                        data.elements.forEach(member => {
+                            if (member.type === 'way' && member.geometry) {
+                                cityCoords.push(member.geometry.map(g => [g.lat, g.lon]));
+                            }
+                        });
+                    }
+                }
+
+                if (cityCoords.length === 0) {
+                    return;
+                }
+
+                const worldMask = [
+                    [90, -180],
+                    [90, 180],
+                    [-90, 180],
+                    [-90, -180],
+                    [90, -180]
+                ];
+
+                L.polygon([worldMask, ...cityCoords], {
+                    color: 'none',
+                    fillColor: '#ffffff',
+                    fillOpacity: 0.7,
+                    interactive: false
+                }).addTo(map);
+
+                L.polyline(cityCoords, {color: '#ff0000', weight: 4, opacity: 0.8}).addTo(map);
+            })
+            .catch(error => console.error('Boundary fetch failed:', error));
+
+        // 2. Googleマップ風の赤ピンアイコン
+        const googlePinIcon = L.divIcon({
+            html: `
+                <svg width="30" height="40" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="google-style-pin">
+                    <path d="M12 0C7.58 0 4 4.48 4 10C4 17.5 12 28 12 28C12 28 20 17.5 20 10C20 4.48 16.42 0 12 0Z" fill="#EA4335"/>
+                    <circle cx="12" cy="10" r="4" fill="white"/>
+                </svg>`,
+            className: "",
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -35]
+        });
+
+        // 3. 資料から抽出した全ポスト・拠点データ [1-3, 7, 8]
+        const postData = [
+            // --- 柏駅周辺 ---
+            { name: "柏駅東口ダブルデッキ", lat: 35.862441, lng: 139.971432, info: "レイソルラッピングポスト" },
+            { name: "柏駅東口・丸井柏店", lat: 35.861985, lng: 139.971556, info: "差出箱12号" },
+            { name: "ハウディモール入口", lat: 35.861312, lng: 139.972354, info: "レイソルラッピングポスト" },
+            { name: "柏駅西口ロータリー", lat: 35.861955, lng: 139.969871, info: "差出箱13号" },
+            { name: "柏駅西口郵便局前", lat: 35.861115, lng: 139.969224, info: "局舎正面" },
+            { name: "柏郵便局（ゴールド）", lat: 35.859752, lng: 139.976054, info: "記念特殊カラー" },
+            { name: "柏郵便局（通常）", lat: 35.859722, lng: 139.975952, info: "差出箱12号" },
+            { name: "ローソンストア100柏千代田店", lat: 35.857991, lng: 139.975112, info: "コンビニ店内" },
+
+            // --- 豊四季台・郊外エリア ---
+            { name: "住宅西口バス停そば", lat: 35.868112, lng: 139.955884, info: "生活道路結節点" },
+            { name: "柏豊四季台郵便局前", lat: 35.866442, lng: 139.956881, info: "差出箱13号" },
+            { name: "柏市西町1番地三叉路", lat: 35.865991, lng: 139.951112, info: "差出箱8号" },
+            { name: "真久堂", lat: 35.859441, lng: 139.964552, info: "希少1号角型旧式" },
+            { name: "柏厚生総合病院", lat: 35.871112, lng: 139.951885, info: "病院ロータリー脇" },
+
+            // --- 南柏・広域ネットワーク ---
+            { name: "柏加賀郵便局", lat: 35.8415, lng: 139.9576, info: "南柏駅東口側拠点" },
+            { name: "柏中新宿郵便局", lat: 35.8368, lng: 139.9632, info: "中新宿エリア" },
+            { name: "柏つくしが丘郵便局", lat: 35.8398, lng: 139.9685, info: "豊住・つくしが丘拠点" },
+            { name: "イオンモール柏内", lat: 35.8521, lng: 139.9615, info: "商業施設内ポスト" },
+
+            // --- 特別デザイン・重要拠点 ---
+            { name: "柏市役所本庁舎前", lat: 35.865121, lng: 139.976512, info: "レイソルラッピングポスト" },
+            { name: "柏第三小学校前", lat: 35.856912, lng: 139.978432, info: "レイソルラッピングポスト" },
+            { name: "柏の葉キャンパス郵便局前", lat: 35.893812, lng: 139.954224, info: "レイソルラッピングポスト" }
+        ];
+
+        // 各地点をプロット
+        postData.forEach(post => {
+            L.marker([post.lat, post.lng], {icon: googlePinIcon}).addTo(map)
+                .bindPopup(`<b>${post.name}</b><br>${post.info}`);
+        });
+    </script>
+</body>
+</html>

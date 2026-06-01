@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>日本全国 イオンモールマップ（住所表示付き）</title>
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+	<link rel="stylesheet" href="1254810976_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810976</div>
+        <div style="font-size:12px;margin-bottom:3px;">坂本　快</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/25 10:40</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810794_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810992_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+	<div id="map"></div>
+
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		const map = new maplibregl.Map({
+			container: 'map',
+			style: 'https://demotiles.maplibre.org/style.json',
+			center: [137.5000, 37.5000], // 日本全体がバランスよく収まる中心位置
+			zoom: 5,                     // 日本全体を見渡せるズームレベル
+			minZoom: 4,                  // 引きすぎ防止
+			maxZoom: 15                  // 拡大の制限
+		});
+
+		// ナビゲーションコントロール（拡大・縮小ボタン）の追加
+		map.addControl(new maplibregl.NavigationControl());
+
+		// ===== 全国主要イオンモールのデータ（住所情報付き） =====
+		const aeonMalls = [
+			{
+				name: "イオンモール札幌発寒",
+				address: "北海道札幌市西区発寒8条12丁目1-1",
+				coordinates: [141.2783, 43.0908]
+			},
+			{
+				name: "イオンモール名取",
+				address: "宮城県名取市杜せきのした5丁目3-1",
+				coordinates: [140.8924, 38.1636]
+			},
+			{
+				name: "イオンモール幕張新都心",
+				address: "千葉県千葉市美浜区豊砂1-1",
+				coordinates: [140.0312, 35.6534]
+			},
+			{
+				name: "イオンレイクタウン (kaze/mori)",
+				address: "埼玉県越谷市レイクタウン4丁目2-2",
+				coordinates: [139.8247, 35.8784]
+			},
+			{
+				name: "イオンモール新利府",
+				address: "宮城県宮城郡利府町新中道3丁目1-1",
+				coordinates: [140.9731, 38.3245]
+			},
+			{
+				name: "イオンモール各務原",
+				address: "岐阜県各務原市那加萱場町3-8",
+				coordinates: [136.8242, 35.3972]
+			},
+			{
+				name: "イオンモールKYOTO",
+				address: "京都府京都市南区西九条鳥居口町1",
+				coordinates: [135.7554, 34.9814]
+			},
+			{
+				name: "イオンモール堺北花田",
+				address: "大阪府堺市北区東浅香山町4丁1-12",
+				coordinates: [135.5161, 34.5843]
+			},
+			{
+				name: "イオンモール広島府中",
+				address: "広島県安芸郡府中町大須2丁目1-1",
+				coordinates: [132.5020, 34.3975]
+			},
+			{
+				name: "イオンモール高松",
+				address: "香川県高松市香西本町1-1",
+				coordinates: [134.0142, 34.3541]
+			},
+			{
+				name: "イオンモール福岡",
+				address: "福岡県糟屋郡粕屋町大字酒殿字老ノ木192-1",
+				coordinates: [130.4812, 33.5972]
+			},
+			{
+				name: "イオンモール沖縄ライカム",
+				address: "沖縄県中頭郡北中城村ライカム1番地",
+				coordinates: [127.7944, 26.3144]
+			}
+		];
+
+		// ===== マーカーとラベル、ポップアップの追加 =====
+		aeonMalls.forEach(mall => {
+			// ピン（マーカー）の追加とクリック時のポップアップ設定
+			new maplibregl.Marker({ color: '#B33E5C' })
+				.setLngLat(mall.coordinates)
+				.setPopup(
+					new maplibregl.Popup({ offset: 25 })
+						.setHTML(`
+							<div style="font-family: sans-serif; padding: 4px; min-width: 150px;">
+								<strong style="font-size: 14px; color: #B33E5C; display: block; margin-bottom: 4px;">${mall.name}</strong>
+								<p style="font-size: 11px; margin: 0; color: #333; line-height: 1.4;">${mall.address}</p>
+							</div>
+						`)
+				)
+				.addTo(map);
+
+			// 常時表示ラベル（ピンの横に表示されるテキスト）の追加
+			const labelElement = document.createElement('div');
+			labelElement.className = 'store-label';
+			labelElement.innerText = mall.name;
+
+			new maplibregl.Marker({ element: labelElement, draggable: false })
+				.setLngLat(mall.coordinates)
+				.addTo(map);
+		});
+	</script>
+
+</body>
+</html>

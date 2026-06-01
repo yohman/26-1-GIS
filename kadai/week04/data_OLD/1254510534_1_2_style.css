@@ -1,0 +1,134 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: black;
+	font-family: sans-serif;
+}
+
+#map {
+	width: 100%;
+	height: 100vh;
+
+	filter: brightness(0.72) saturate(0.55);
+}
+
+#title {
+	position: absolute;
+
+	top: 20px;
+	left: 20px;
+
+	z-index: 2;
+
+	color: white;
+
+	font-size: 30px;
+	font-weight: bold;
+
+	padding: 16px 22px;
+
+	border-radius: 18px;
+
+	background: rgba(0,0,0,0.45);
+
+	backdrop-filter: blur(8px);
+
+	box-shadow: 0 0 25px rgba(180,120,255,0.3);
+}
+
+#subtitle {
+	font-size: 14px;
+	font-weight: normal;
+
+	margin-top: 8px;
+
+	color: #d0d0d0;
+}
+
+#buttons {
+	position: absolute;
+
+	top: 120px;
+	left: 20px;
+
+	z-index: 2;
+}
+
+button {
+	background: rgba(0,0,0,0.7);
+
+	color: white;
+
+	border: 1px solid #d26bff;
+
+	padding: 10px 14px;
+
+	margin-right: 8px;
+
+	border-radius: 10px;
+
+	cursor: pointer;
+
+	transition: 0.2s;
+}
+
+button:hover {
+	background: #d26bff;
+}
+
+#videoBox {
+	position: absolute;
+
+	right: 20px;
+	bottom: 20px;
+
+	z-index: 2;
+
+	background: rgba(0,0,0,0.5);
+
+	padding: 10px;
+
+	border-radius: 16px;
+
+	backdrop-filter: blur(6px);
+}
+
+iframe {
+	border-radius: 12px;
+}
+
+.custom-marker {
+	width: 18px;
+	height: 18px;
+
+	border-radius: 50%;
+
+	background: #d26bff;
+
+	box-shadow:
+	0 0 10px #d26bff,
+	0 0 20px #d26bff;
+}
+
+.maplibregl-popup-content {
+
+	background: rgba(10,10,10,0.92);
+
+	color: white;
+
+	border-radius: 14px;
+
+	padding: 15px;
+
+	box-shadow: 0 0 20px rgba(180,120,255,0.4);
+}
+
+.maplibregl-popup-content h2 {
+	margin-top: 0;
+	color: #d26bff;
+}
+
+.maplibregl-popup-tip {
+	border-top-color: rgba(10,10,10,0.9) !important;
+}

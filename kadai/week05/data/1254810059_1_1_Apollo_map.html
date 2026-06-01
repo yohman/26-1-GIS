@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Earth with Pins</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+}
+
+/* 吹き出し */
+#popup{
+
+    position:absolute;
+
+    min-width:220px;
+
+    padding:12px;
+
+    background:rgba(0,0,0,0.85);
+
+    color:white;
+
+    border-radius:0px;
+
+    border:1px solid #00e5ff;
+
+    font-family:sans-serif;
+
+    display:none;
+
+    z-index:1000;
+
+    box-shadow:0 0 20px rgba(0,229,255,0.5);
+
+    backdrop-filter:blur(4px);
+}
+
+/* タイトル */
+#popup h3{
+    margin:0 0 8px 0;
+    color:#00e5ff;
+}
+
+/* 本文 */
+#popup p{
+    margin:0;
+    line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810059</div>
+        <div style="font-size:12px;margin-bottom:3px;">粟野　翔<br><span style='font-size:9px;color:#999;'>アワノ　カケル</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/01 14:06</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/zV61Q6xgMJAGWO98" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254690352_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810075_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+    <div id="popup"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+
+const scene = new THREE.Scene();
+
+const raycaster = new THREE.Raycaster();
+
+const mouse = new THREE.Vector2();
+
+const clickablePins = [];
+
+const popup = document.getElementById("popup");
+
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+
+camera.position.z = 2;
+
+const renderer = new THREE.WebGLRenderer({
+    antialias:true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+document.body.appendChild(renderer.domElement);
+
+// コントロール
+const controls = new THREE.OrbitControls(
+    camera,
+    renderer.domElement
+);
+
+controls.enableDamping = true;
+
+// ======================
+// 地球
+// ======================
+
+const loader = new THREE.TextureLoader();
+
+let earth;
+
+let eclipseShadow;
+
+loader.load(
+    'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
+
+    function(texture){
+
+        const geometry = new THREE.SphereGeometry(0.7, 64, 64);
+
+        const material = new THREE.MeshBasicMaterial({
+            map:texture
+        });
+
+        earth = new THREE.Mesh(geometry, material);
+
+        scene.add(earth);
+
+        // ======================
+// 月の影
+// ======================
+
+const shadowGeometry =
+    new THREE.SphereGeometry(0.08, 32, 32);
+
+const shadowMaterial =
+    new THREE.MeshBasicMaterial({
+        color:0x000000,
+        transparent:true,
+        opacity:0.45
+    });
+
+eclipseShadow =
+    new THREE.Mesh(
+        shadowGeometry,
+        shadowMaterial
+    );
+
+scene.add(eclipseShadow);
+
+        // ピン追加（地球のあと）
+        addPins();
+
+        animate();
+    }
+);
+
+// ======================
+// ピン変換関数
+// ======================
+
+function latLonToVector3(lat, lon, radius){
+
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+
+    const x = -radius * Math.sin(phi) * Math.cos(theta);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
+
+    return new THREE.Vector3(x, y, z);
+}
+
+function createArc(points, color=0xff6666){
+
+    const vectors = [];
+
+    points.forEach(p => {
+
+        vectors.push(
+            latLonToVector3(
+                p.lat,
+                p.lon,
+                0.75
+            )
+        );
+    });
+
+    const geometry =
+        new THREE.BufferGeometry().setFromPoints(vectors);
+
+    const material =
+        new THREE.LineBasicMaterial({
+            color:color
+        });
+
+    const line =
+        new THREE.Line(geometry, material);
+
+    scene.add(line);
+}
+
+// ======================
+// ピンデータ
+// ======================
+
+const pins = [
+
+{
+    name:"2034 皆既日食",
+    lat:33,
+    lon:90,
+    description:"中国付近で皆既日食"
+},
+
+{
+    name:"ブラジル開始地点",
+    lat:-1,
+    lon:-38,
+    description:"2034年日食の開始地点"
+}
+
+];
+
+const eclipsePath = [
+
+    {lat:-1, lon:-38},
+    {lat:5, lon:-20},
+    {lat:9, lon:0},
+    {lat:13, lon:15},
+    {lat:17, lon:30},
+    {lat:23, lon:45},
+    {lat:28, lon:60},
+    {lat:31, lon:75},
+    {lat:33, lon:90},
+    {lat:35, lon:105}
+
+];
+// ======================
+// ピン追加
+// ======================
+
+function addPins(){
+
+
+    pins.forEach(p => {
+
+        const pinGeometry =
+            new THREE.SphereGeometry(0.02, 16, 16);
+
+        const pinMaterial =
+            new THREE.MeshBasicMaterial({
+                color:0x00e5ff
+            });
+
+        const pin =
+            new THREE.Mesh(pinGeometry, pinMaterial);
+
+        const pos =
+            latLonToVector3(
+                p.lat,
+                p.lon,
+                0.72 // 地球より少し外
+            );
+
+        pin.position.copy(pos);
+
+        scene.add(pin);
+pin.userData = p;
+
+clickablePins.push(pin);
+
+        // ラベル代わりの線
+        const lineGeometry =
+            new THREE.BufferGeometry().setFromPoints([
+                pos,
+                pos.clone().multiplyScalar(1.1)
+            ]);
+
+        const lineMaterial =
+            new THREE.LineBasicMaterial({
+                color:0x00e5ff
+            });
+
+        const line =
+            new THREE.Line(lineGeometry, lineMaterial);
+
+        scene.add(line);
+    });
+}
+
+
+createArc([
+
+    {lat:-1, lon:-38},   // ブラジル沖
+    {lat:5, lon:-20},    // 大西洋
+    {lat:9, lon:0},      // 西アフリカ
+    {lat:13, lon:15},    // ナイジェリア
+    {lat:17, lon:30},    // スーダン
+    {lat:23, lon:45},    // サウジ
+    {lat:28, lon:60},    // イラン
+    {lat:31, lon:75},    // パキスタン
+    {lat:33, lon:90},    // インド北部
+    {lat:35, lon:105}    // 中国
+
+], 0xff5533);
+
+createArc([
+
+    {lat:2, lon:-38},
+    {lat:8, lon:-20},
+    {lat:12, lon:0},
+    {lat:16, lon:15},
+    {lat:20, lon:30},
+    {lat:26, lon:45},
+    {lat:31, lon:60},
+    {lat:34, lon:75},
+    {lat:36, lon:90},
+    {lat:38, lon:105}
+
+], 0xffaaaa);
+
+createArc([
+
+    {lat:-4, lon:-38},
+    {lat:1, lon:-20},
+    {lat:5, lon:0},
+    {lat:9, lon:15},
+    {lat:13, lon:30},
+    {lat:18, lon:45},
+    {lat:23, lon:60},
+    {lat:27, lon:75},
+    {lat:29, lon:90},
+    {lat:31, lon:105}
+
+], 0xffaaaa);
+
+window.addEventListener('click', (event)=>{
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects =
+        raycaster.intersectObjects(clickablePins);
+
+    if(intersects.length > 0){
+
+        const pin = intersects[0].object;
+
+       popup.style.display = "block";
+
+popup.style.left = event.clientX + 15 + "px";
+
+popup.style.top = event.clientY + 15 + "px";
+
+popup.innerHTML = `
+    <h3>${pin.userData.name}</h3>
+    <p>${pin.userData.description}</p>
+`;
+    }
+
+    else{
+
+    popup.style.display = "none";
+}
+});
+
+// ======================
+// アニメーション
+// ======================
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+   
+
+    controls.update();
+
+    renderer.render(scene, camera);
+
+    if(eclipseShadow){
+
+    const time =
+        Date.now() * 0.00008;
+
+    const index =
+        Math.floor(time % eclipsePath.length);
+
+    const nextIndex =
+        (index + 1) % eclipsePath.length;
+
+    const t =
+        time % 1;
+
+    const current =
+        eclipsePath[index];
+
+    const next =
+        eclipsePath[nextIndex];
+
+    const lat =
+        current.lat +
+        (next.lat - current.lat) * t;
+
+    const lon =
+        current.lon +
+        (next.lon - current.lon) * t;
+
+    const pos =
+        latLonToVector3(
+            lat,
+            lon,
+            0.71
+        );
+
+    eclipseShadow.position.copy(pos);
+}
+}
+
+// ======================
+// リサイズ
+// ======================
+
+window.addEventListener('resize', ()=>{
+
+    camera.aspect =
+        window.innerWidth / window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+});
+
+</script>
+
+</body>
+</html>

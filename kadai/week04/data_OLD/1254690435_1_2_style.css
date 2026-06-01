@@ -1,0 +1,39 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: Arial;
+}
+
+h1 {
+	text-align: center;
+	margin: 10px;
+}
+
+/* MAIN LAYOUT */
+#container {
+	display: flex;
+	height: calc(100vh - 60px);
+}
+
+/* MAP */
+#map {
+	width: 75%;
+	height: 100%;
+}
+
+/* SIDEBAR */
+#sidebar {
+	width: 25%;
+	padding: 15px;
+	background: white;
+	border-left: 2px solid #ccc;
+	overflow-y: auto;
+}
+
+/* IMAGE */
+#sidebar img {
+	width: 100%;
+	border-radius: 10px;
+	margin-bottom: 10px;
+}

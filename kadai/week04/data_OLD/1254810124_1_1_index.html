@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- 文字エンコーディングをUTF-8に設定（日本語の文字化け防止） -->
+    <meta charset="utf-8">
+
+    <!-- ブラウザのタブに表示されるページタイトル -->
+    <title>My Special Web Map</title>
+
+    <!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+    <!-- 画面全体のスタイル調整 -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 地図を画面いっぱいに表示 */
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* ボタンを配置するコントロールパネルの見た目 */
+        .control-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1; /* 地図より手前に表示 */
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-family: sans-serif;
+        }
+
+        /* パネルの中のボタンのデザイン */
+        .control-panel button {
+            display: block;
+            margin: 5px 0;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 140px;
+        }
+
+        .control-panel button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810124</div>
+        <div style="font-size:12px;margin-bottom:3px;">江口　歩真</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/20 00:46</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810075_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810174_1_1_好きなラーメン屋ランキング.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+    <!-- 画面の左上に表示されるジャンプボタンのパネル（東京駅から南柏駅に変更） -->
+    <div class="control-panel">
+        <div style="font-size: 12px; margin-bottom: 5px; color: #333;">視点切り替え</div>
+        <button id="btn-kashiwa">南柏駅へ飛ぶ</button>
+        <button id="btn-koshigaya">北越谷駅に戻る</button>
+    </div>
+
+    <!-- 地図を表示するためのコンテナ -->
+    <div id="map"></div>
+
+    <!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+    <script>
+        // ==========================================
+        // 1. 地図の初期化 & デザイン変更
+        // ==========================================
+        const map = new maplibregl.Map({
+            container: 'map',  // 地図を表示する要素のID
+            style: 'https://tiles.openfreemap.org/styles/liberty', 
+            center: [139.7812, 35.9018],  // 初期表示の中心座標 [経度, 緯度]（北越谷駅）
+            zoom: 14   // 初期ズームレベル
+        });
+
+
+        // ==========================================
+        // 2. 便利機能（コントロール）の追加
+        // ==========================================
+        // 地図の右上にズームボタンと回転ボタンを追加
+        map.addControl(new maplibregl.NavigationControl());
+
+        // 地図の左下に日本の単位（m/km）に固定したスケール（縮尺バー）を追加
+        map.addControl(new maplibregl.ScaleControl({
+            maxWidth: 80,
+            unit: 'metric'
+        }));
+
+
+        // ==========================================
+        // 3. カスタムアイコン & 指定YouTube付きマーカーの追加
+        // ==========================================
+        
+        // マーカー用の画像要素（imgタグ）を作成
+        const el = document.createElement('img');
+        el.src = 'https://img.icons8.com/color/48/marker.png'; // ネット上の可愛いピン画像
+        el.style.width = '40px';  // 画像の横幅
+        el.style.height = '40px'; // 画像の縦幅
+
+        // ポップアップの中に埋め込むHTML（タイトル ＋ ご指定のYouTube動画）
+        const youtubeHtml = `
+            <div style="font-family: sans-serif; width: 240px;">
+                <h3 style="margin: 0 0 5px 0; color: #333;">北越谷駅</h3>
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">越谷の紹介動画を埋め込みました！</p>
+                <iframe width="240" height="135" 
+                    src="https://www.youtube.com/embed/VgRKE4d2A3g" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        `;
+
+        // 作成した要素とHTMLを使って、地図上にマーカーを設置
+        new maplibregl.Marker({ element: el })
+            .setLngLat([139.7812, 35.9018]) // 北越谷駅の座標
+            .setPopup(
+                new maplibregl.Popup({ maxWidth: '280px' }) // ポップアップが潰れないように最大幅を設定
+                    .setHTML(youtubeHtml)
+            )
+            .addTo(map);
+
+
+        // ==========================================
+        // 4. ボタンを押したらジャンプする機能
+        // ==========================================
+        
+        // 「南柏駅へ飛ぶ」ボタンが押されたときの処理（ここを修正！）
+        document.getElementById('btn-kashiwa').addEventListener('click', () => {
+            map.flyTo({
+                center: [139.9545, 35.8448], // 南柏駅の座標
+                zoom: 15,
+                speed: 1.2, // 移動するスピード
+                curve: 1.4  // 飛行の曲線の強さ
+            });
+        });
+
+        // 「北越谷駅に戻る」ボタンが押されたときの処理
+        document.getElementById('btn-koshigaya').addEventListener('click', () => {
+            map.flyTo({
+                center: [139.7812, 35.9018], // 北越谷駅の座標
+                zoom: 14,
+                speed: 1.2
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

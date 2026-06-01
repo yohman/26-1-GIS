@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Shibuya Livehouse Spatial Analysis Map</title>
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="1254510435_1_2_style.css">
+    <style>
+        /* ポップアップ内の文字サイズなどを少し調整 */
+        .maplibre-popup-content {
+            font-family: sans-serif;
+            padding: 15px;
+        }
+        /* キャパシティ（凡例）の説明を地図上に浮かせる */
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: sans-serif;
+            font-size: 12px;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510435</div>
+        <div style="font-size:12px;margin-bottom:3px;">岡野　俊介</div>
+        <div style="font-size:10px;color:#ccc;">2026/05/20 12:05</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810992_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510534_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+    <div id="map"></div>
+
+    <div class="legend">
+        <strong>【データ可視化の基準】</strong><br>
+        ピンの大きさ ＝ 各施設の収容人数（キャパ）
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+    <script>
+        // ===== 地図の初期化 =====
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {
+                    'gsi-satellite': {
+                        type: 'raster',
+                        tiles: ['https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg'],
+                        tileSize: 256,
+                        attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>国土地理院</a>"
+                    }
+                },
+                layers: [
+                    {
+                        id: 'gsi-satellite-layer',
+                        type: 'raster',
+                        source: 'gsi-satellite',
+                        minzoom: 0,
+                        maxzoom: 18
+                    }
+                ]
+            },
+            center: [139.69527599851116, 35.65857115399049], // 初期表示（渋谷）
+            zoom: 18,
+            minZoom: 0,
+            maxZoom: 18
+        });
+
+        // コントロール類の追加（ズームと現在地表示）
+        map.addControl(new maplibregl.NavigationControl());
+        map.addControl(new maplibregl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true
+        }));
+
+        // ===== マーカーデータ（キャパシティ情報付き） =====
+        const locations = [
+            { lng: 139.6956647398099, lat: 35.658913251191755, name: "Spotify O-EAST", url: "https://shibuya-o.com/east/", capacity: 1300 },
+            { lng: 139.6953003419312, lat: 35.65861502260183, name: "Spotify O-WEST", url: "https://shibuya-o.com/west/", capacity: 600 },
+            { lng: 139.69527599851116, lat: 35.65857115399049, name: "Spotify O-nest", url: "https://shibuya-o.com/nest/", capacity: 250 },
+            { lng: 139.6952506550911, lat: 35.65852728537915, name: "Spotify O-Crest", url: "https://shibuya-o.com/crest/", capacity: 250 },
+            { lng: 139.6954715736083, lat: 35.65866034133595, name: "duo MUSIC EXCHANGE", url: "http://www.duomusicexchange.com/", capacity: 700 },
+            { lng: 139.69493209212214, lat: 35.658444542211825, name: "渋谷WOMB", url: "https://www.womb.co.jp/", capacity: 600 }
+        ];
+
+        // ループ処理で、キャパに応じた「しずく型ピン」の大きさを変えて地図に追加
+        locations.forEach(loc => {
+            // ★統計的可視化：元のピンの形のまま、キャパに応じてスケール（倍率）を0.7倍〜1.5倍に自動変化させる
+            let scaleValue = 1.0;
+            if (loc.capacity >= 1000) {
+                scaleValue = 1.5; // 大規模（O-EASTなど）
+            } else if (loc.capacity >= 600) {
+                scaleValue = 1.1; // 中規模（O-WEST, duo, WOMBなど）
+            } else {
+                scaleValue = 0.7; // 小規模（O-nest, Crestなど）
+            }
+
+            // MapLibre標準のピン（赤色）にサイズ倍率（scale）を指定して作成
+            new maplibregl.Marker({ 
+                color: '#ff0000',
+                scale: scaleValue // ここでピンの全体の大きさを変えています
+            })
+            .setLngLat([loc.lng, loc.lat])
+            .setPopup(
+                new maplibregl.Popup().setHTML(`
+                    <h3 style="margin:0 0 5px 0;">${loc.name}</h3>
+                    <p style="margin:0 0 10px 0; color:#666;">収容人数：<strong>${loc.capacity}名</strong></p>
+                    <a href="${loc.url}" target="_blank" style="color: #0066cc; text-decoration: underline;">公式サイトを開く</a>
+                `)
+            )
+            .addTo(map);
+        });
+    </script>
+
+</body>
+
+</html>

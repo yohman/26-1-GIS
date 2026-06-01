@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>関東の隠れ人気スポットマップ</title>
+
+<link rel="stylesheet" href="1254810174_1_5_第五回GIS課題_鬼塚駿.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810174</div>
+        <div style="font-size:12px;margin-bottom:3px;">鬼塚　駿<br><span style='font-size:9px;color:#999;'>オニツカ　シュン</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/01 15:19</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/Xb8YaLpvLwmBayn1" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810124_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810182_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+<header>
+    <h1>関東の隠れ人気スポットマップ</h1>
+    <p>RESASの人流データを参考にした観光スポット紹介</p>
+</header>
+
+<section>
+    <h2>プロジェクト概要</h2>
+    <p>
+        自分が行ったことある魅力があるところをまとめました！その後調べ作業をし、厳選した3つを紹介します！
+    </p>
+</section>
+
+<div id="map"></div>
+
+<section class="cards">
+
+<div class="card fade-in">
+    <img src="1254810174_1_2_日原鍾乳洞.jpg" alt="日原鍾乳洞">
+    <p class="photo-note"></p>
+    <h3>日原鍾乳洞</h3>
+    <p>東京最大級の鍾乳洞であり、夏でも涼しく自然を体験できます。自分は夏に行ったんですが涼しくて快適でした。</p>
+</div>
+
+<div class="card fade-in">
+    <img src="1254810174_1_3_よこはまコスモワールド.webp" alt="よこはまコスモワールド">
+    <p class="photo-note"></p>
+    <h3>よこはまコスモワールド</h3>
+    <p>みなとみらいを代表する都市型遊園地です。去年ここで友達と一日中遊び疲れ果ててました。</p>
+</div>
+
+<div class="card fade-in">
+    <img src="1254810174_1_1_小貝川ふれあい公園.jpg" alt="小貝川ふれあい公園">
+    <p class="photo-note"></p>
+    <h3>小貝川ふれあい公園</h3>
+    <p>ポピーやコスモスが有名な自然豊かな公園です。花が好きな友達との付き合いで行ってみたのですがとてもきれいでした。</p>
+</div>
+
+</section>
+
+<footer>
+Data Source : RESAS / Leaflet / OpenStreetMap
+</footer>
+
+<script>
+const map = L.map('map').setView([35.7,139.6],8);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+ attribution:'&copy; OpenStreetMap'
+}).addTo(map);
+
+L.marker([35.8178,139.0150]).addTo(map)
+.bindPopup("<b>日原鍾乳洞</b><br>東京最大級の鍾乳洞");
+
+L.marker([35.4550,139.6367]).addTo(map)
+.bindPopup("<b>よこはまコスモワールド</b><br>みなとみらいの人気スポット");
+
+L.marker([36.1685,139.9677]).addTo(map)
+.bindPopup("<b>小貝川ふれあい公園</b><br>花と自然を楽しめる公園");
+
+const targets = document.querySelectorAll(".fade-in");
+
+window.addEventListener("scroll",()=>{
+ targets.forEach(target=>{
+   const pos = target.getBoundingClientRect().top;
+   if(pos < window.innerHeight - 100){
+      target.classList.add("show");
+   }
+ });
+});
+</script>
+
+</body>
+</html>

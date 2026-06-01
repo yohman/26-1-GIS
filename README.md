@@ -1,0 +1,3 @@
+# 26-1-GIS
+
+Welcome to my GIS course at Reitaku University. This course offers to teach the foundations of web based mapping. Students will learn how to create engaging and interactive maps for the web based on their passion and creativity. It will be reflective of the students' interests and will be a fun and rewarding experience. The course will cover the basics of web mapping, including how to use various tools and technologies to create maps that are both informative and visually appealing. By the end of the course, students will have the skills and knowledge needed to create their own web maps and share them with others.

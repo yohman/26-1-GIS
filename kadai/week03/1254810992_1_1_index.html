@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自己紹介ページ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #e8f5ff 0%, #dbe9ff 40%, #f6f9ff 100%);
+            color: #1d3557;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+        header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 22px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+            padding: 28px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(29, 53, 87, 0.08);
+        }
+        h1 {
+            margin: 0 0 10px;
+            font-size: 2.4rem;
+        }
+        h2 {
+            margin: 0 0 14px;
+            font-size: 1.5rem;
+        }
+        .profile {
+            display: grid;
+            grid-template-columns: minmax(240px, 320px) 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        .profile img,
+        .scuba-card img {
+            width: 100%;
+            border-radius: 20px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+            object-fit: cover;
+        }
+        .info,
+        .scuba-card,
+        .favorite,
+        .skills {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(29, 53, 87, 0.08);
+        }
+        .info p,
+        .favorite p,
+        .skills p {
+            margin: 0 0 16px;
+        }
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .badge {
+            display: inline-block;
+            background: #f0f8ff;
+            color: #1d4ed8;
+            border: 1px solid #b6d4ff;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.95rem;
+        }
+        ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            color: #1d4ed8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .scuba-card {
+            display: grid;
+            grid-template-columns: minmax(180px, 260px) 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-top: 24px;
+        }
+        .scuba-card h2 {
+            margin-top: 0;
+        }
+        .scuba-card p {
+            margin-bottom: 10px;
+        }
+        .scuba-card img {
+            width: 100%;
+            border-radius: 20px;
+            border: 4px solid #ffffff;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+            object-fit: cover;
+            transition: opacity 0.4s ease, max-height 0.4s ease;
+            display: block;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .scuba-card img.visible {
+            opacity: 1;
+            max-height: 500px;
+        }
+        .scuba-card,
+        .favorite,
+        .skills,
+        .profile {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .scuba-card:hover,
+        .favorite:hover,
+        .skills:hover,
+        .profile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 45px rgba(0,0,0,0.16);
+        }
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1d4ed8;
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(29, 78, 216, 0.2);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            background: #2563eb;
+        }
+        .hidden {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+        .visible {
+            opacity: 1;
+            max-height: 120px;
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .skill-box {
+            background: #eef6ff;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: inset 0 0 0 1px rgba(29, 53, 87, 0.05);
+        }
+        .skill-box strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #1d3557;
+        }
+        footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div style="position:fixed;top:20px;right:20px;display:flex;gap:5px;z-index:9999;"><a href="1254810976_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254811049_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div>
+
+    
+
+
+
+<div class="container">
+        <header>
+            <h1>モンテラ エドウィン</h1>
+            <p>こんにちは！私はウェブ制作と地理情報に興味がある学生です。</p>
+        </header>
+
+        <section class="profile">
+            <img src="1254810992_1_2_IMG_2169.jpeg" alt="自分の写真" />
+            <div class="info">
+                <h2>自己紹介</h2>
+                <p>私は日本語と英語の両方で学ぶのが好きで、新しいことに挑戦するのが得意です。趣味はプログラミング、地図を見て世界の場所を調べること、そして旅行です。</p>
+                <p>この授業では、Webサイトの作り方やHTML・CSSの基本、そしてWebマップの活用方法をしっかり学びたいと考えています。</p>
+                <p>将来は、デザインと技術を組み合わせたサービスや、災害情報の可視化に役立つプロジェクトを作りたいです。</p>
+            </div>
+        </section>
+
+        <section class="scuba-card">
+            <img id="scubaImg" alt="Scuba Cat" data-src="1254810992_1_3_scuba.gif" />
+            <div>
+                <h2>スキューバキャット</h2>
+                <button class="action-button" id="scubaButton">タッチしてね</button>
+                <p id="scubaNote" class="hidden">ようこそ！</p>
+            </div>
+        </section>
+
+        <section class="favorite">
+            <h2>My Favorite Websites / Maps</h2>
+            <p>勉強や調べ物に役立つサイトをよく使います。</p>
+            <ul>
+                <li>
+                    気になる Web マップ：
+                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                        Google マップ
+                    </a>
+                </li>
+                <li>
+                    好きな Web サイト：
+                    <a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">
+                        Wikipedia
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <section class="skills">
+            <h2>スキル & 趣味</h2>
+            <div class="skills-grid">
+                <div class="skill-box">
+                    <strong>HTML / CSS</strong>
+                    Webページを自分で作るのが楽しいです。
+                </div>
+                <div class="skill-box">
+                    <strong>地図 / GIS</strong>
+                    世界の場所を調べるのが好きです。
+                </div>
+                <div class="skill-box">
+                    <strong>プログラミング</strong>
+                    新しい仕組みをつくることに挑戦しています。
+                </div>
+                <div class="skill-box">
+                    <strong>旅行</strong>
+                    旅行先の文化や自然を見るのが楽しみです。
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>このページは「自己紹介ページの作成」用に作成しました。写真ファイル名が異なる場合は <code>IMG_2169.jpeg</code> を <code>photo.jpg</code> に変更してください。</p>
+        </footer>
+    </div>
+    <script>
+        const scubaButton = document.getElementById('scubaButton');
+        const scubaNote = document.getElementById('scubaNote');
+        const scubaImg = document.getElementById('scubaImg');
+        scubaButton.addEventListener('click', () => {
+            scubaNote.classList.toggle('visible');
+            scubaNote.classList.toggle('hidden');
+            if (scubaImg.classList.contains('visible')) {
+                scubaImg.classList.remove('visible');
+                scubaImg.removeAttribute('src');
+            } else {
+                scubaImg.src = scubaImg.dataset.src;
+                scubaImg.classList.add('visible');
+            }
+        });
+    </script>
+</body>
+</html>
