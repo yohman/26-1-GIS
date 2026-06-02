@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254510534_1_2_style.css">
+</head>
+
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510534</div>
+        <div style="font-size:12px;margin-bottom:3px;">川合　悠<br><span style='font-size:9px;color:#999;'>カワイ　ユウ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/05/27 15:08</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/goElQyOYYAmbW3yY" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254510435_1_1_index (1).html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510625_1_2_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+	<!-- タイトル -->
+<div id="title">
+	<img src="1254510534_1_3_hama.PNG" id="hama">
+	<h1>近くのはま寿司</h1>
+</div>
+	<!-- 地図 -->
+	<div id="map"></div>
+
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+<script>
+
+	// 地図作成
+	const map = new maplibregl.Map({
+		container: 'map',
+style: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json',
+		center: [139.7671, 35.6812],
+		zoom: 4
+	});
+
+	// ズームボタン
+	map.addControl(new maplibregl.NavigationControl());
+
+	// ===== ① 現在地を取得 =====
+	navigator.geolocation.getCurrentPosition((position) => {
+
+		const userLng = position.coords.longitude;
+		const userLat = position.coords.latitude;
+
+		// 現在地へ移動
+		map.setCenter([userLng, userLat]);
+
+		// 拡大
+		map.setZoom(13);
+
+		// 青マーカー
+		new maplibregl.Marker({ color: "blue" })
+			.setLngLat([userLng, userLat])
+			.setPopup(
+				new maplibregl.Popup()
+					.setHTML("<h3>現在地</h3>")
+			)
+			.addTo(map);
+
+	});
+
+	// ===== ② はま寿司マーカー追加 =====
+	new maplibregl.Marker({ color: "red" })
+		.setLngLat([139.971, 35.867])
+		.setPopup(
+			new maplibregl.Popup()
+				.setHTML(`
+					<h3>はま寿司 柏十余二店</h3>
+					<p>24時まで営業</p>
+				`)
+		)
+		.addTo(map);
+
+</script>
+
+</body>
+
+</html>
+

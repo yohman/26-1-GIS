@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Fantasy History Map</title>
+
+    <link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="1254810140_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810140</div>
+        <div style="font-size:12px;margin-bottom:3px;">太田　和毅<br><span style='font-size:9px;color:#999;'>オオタ　カズキ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/02 08:14</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/9kmlZVpA6E8AapgV" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810124_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810166_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+    <!-- UI（モード切り替えボタン） -->
+    <div id="ui">
+        <button id="modeToggle">fantasy-map に切り替え</button>
+    </div>
+
+    <!-- 地図 -->
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+    <script>
+        // ===== モード管理 =====
+        let isFantasy = false;
+
+        // ===== 国データ一覧 =====
+        const countries = [
+            {
+                name: "日本",
+                coords: [139.6917, 35.6895],
+                real: `
+                    <h3>日本（Japan）</h3>
+                    <p>古代から続く島国で、武家政権や明治維新など多様な歴史を持つ。</p>
+                `,
+                fantasy: `
+                    <h3>日本王国 - 霊峰の守護者</h3>
+                    <p>龍族と人間が共存し、侍は星のかけらから鍛えた魔刀を操る。</p>
+                `
+            },
+            {
+                name: "フランス",
+                coords: [2.3522, 48.8566],
+                real: `
+                    <h3>フランス（France）</h3>
+                    <p>中世フランク王国から発展し、革命を経て共和国となった。</p>
+                `,
+                fantasy: `
+                    <h3>薔薇の魔導帝国</h3>
+                    <p>魔法使いが政治を司り、薔薇の魔力で国を繁栄させた。</p>
+                `
+            },
+            {
+                name: "アメリカ合衆国",
+                coords: [-77.0369, 38.9072],
+                real: `
+                    <h3>アメリカ合衆国（USA）</h3>
+                    <p>1776年に独立し、多民族国家として発展した。</p>
+                `,
+                fantasy: `
+                    <h3>星々の連邦</h3>
+                    <p>天空の精霊と契約した開拓者たちが築いた国。</p>
+                `
+            }
+        ];
+
+        // ===== 地図の初期化 =====
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json', // 実際の地図
+            center: [20, 20],
+            zoom: 2
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+
+        // ===== マーカー管理 =====
+        const markers = [];
+
+        // ===== 国ごとのピンを作成 =====
+        function createMarkers() {
+            countries.forEach(country => {
+                const popup = new maplibregl.Popup().setHTML(
+                    isFantasy ? country.fantasy : country.real
+                );
+
+                const marker = new maplibregl.Marker()
+                    .setLngLat(country.coords)
+                    .setPopup(popup)
+                    .addTo(map);
+
+                markers.push({ marker, popup, country });
+            });
+        }
+
+        createMarkers();
+
+        // ===== スタイル切り替え =====
+        function updateMapStyle() {
+            if (isFantasy) {
+                map.setStyle("1254810140_1_3_fantasy-style.json");
+            } else {
+                map.setStyle("https://demotiles.maplibre.org/style.json");
+            }
+        }
+
+        // ===== モード切り替えボタン =====
+        const modeToggleBtn = document.getElementById('modeToggle');
+
+        modeToggleBtn.addEventListener('click', () => {
+            isFantasy = !isFantasy;
+
+            modeToggleBtn.textContent = isFantasy
+                ? '実際の地図 に切り替え'
+                : 'fantasy-map に切り替え';
+
+            // 地図の色調を切り替え
+            updateMapStyle();
+
+            // ポップアップ内容を更新
+            markers.forEach(obj => {
+                obj.popup.setHTML(
+                    isFantasy ? obj.country.fantasy : obj.country.real
+                );
+            });
+        });
+    </script>
+
+</body>
+
+</html>

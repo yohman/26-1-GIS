@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Fate Globe Map</title>
+
+    <!-- MapLibre CSS -->
+
+    <link
+        href="https://unpkg.com/maplibre-gl@^5.0.0/dist/maplibre-gl.css"
+        rel="stylesheet"
+    >
+
+    <!-- 自分のCSS -->
+
+    <link rel="stylesheet" href="1254810182_1_3_style.css">
+
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810182</div>
+        <div style="font-size:12px;margin-bottom:3px;">柿木　奏太<br><span style='font-size:9px;color:#999;'>カキノキ　ソウタ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/05/29 15:31</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810174_1_4_第五回GIS課題_鬼塚駿.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810299_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+    <!-- ===== 左メニュー ===== -->
+
+    <div id="menu">
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(24.138056, -71.526111)"
+        >
+            旧カルデア
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(2.3522, 48.8566)"
+        >
+            １部１章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(12.4964, 41.9028)"
+        >
+            １部２章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(-160.0, 0.0)"
+        >
+            １部３章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(-0.1276, 51.5072)"
+        >
+            １部４章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(-100.0, 45.0)"
+        >
+            １部５章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(35.2137, 31.7683)"
+        >
+            １部６章
+        </button>
+
+        <button
+            class="place-button"
+            onclick="moveToPlace(47.8150, 30.5085)"
+        >
+            １部７章
+        </button>
+    </div>
+
+    <!-- ===== 人理焼却ボタン ===== -->
+
+    <button
+        id="burn-button"
+        onclick="burnHumanity()"
+    >
+        人理焼却
+    </button>
+
+    <!-- ===== 地図 ===== -->
+
+    <div id="map"></div>
+
+    <!-- MapLibre JS -->
+
+    <script src="https://unpkg.com/maplibre-gl@^5.0.0/dist/maplibre-gl.js"></script>
+
+    <!-- 自分のJS -->
+
+    <script src="1254810182_1_2_script.js"></script>
+
+</body>
+
+</html>

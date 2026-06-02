@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>東京の夜景をめぐるストーリーマップ</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Leaflet 読み込み -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510287</div>
+        <div style="font-size:12px;margin-bottom:3px;">江口　健太<br><span style='font-size:9px;color:#999;'>エグチ　ケンタ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/02 09:01</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254510229_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510435_1_1_index (1).html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+  <header>
+    <h1>東京の夜景をめぐるストーリーマップ</h1>
+    <p>東京の中でも特に印象的だった夜景スポットを、写真とストーリーとともに紹介します。</p>
+  </header>
+
+  <div id="map"></div>
+
+  <section id="story">
+    <h2>ストーリー</h2>
+    <p>
+      このマップは「東京の夜景」をテーマにしています。  
+      都会の光、川に映る反射、展望台からの眺めなど、夜の東京には昼とは違う表情があります。  
+      マーカーをクリックすると、それぞれの場所で感じた雰囲気や思い出を読むことができます。
+    </p>
+  </section>
+
+  <script>
+    // --- 地図の初期設定 ---
+    const map = L.map('map').setView([35.6804, 139.7690], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // --- カスタムアイコン ---
+    const customIcon = L.icon({
+      iconUrl: 'marker.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -35]
+    });
+
+    // --- 夜景スポット ---
+    const spots = [
+      {
+        name: "東京タワー",
+        lat: 35.6586,
+        lng: 139.7454,
+        img: "img/tokyotower.jpg",
+        desc: "東京の象徴とも言える夜景スポット。オレンジ色のライトアップが温かく、街全体を包み込むような雰囲気が印象的。"
+      },
+      {
+        name: "渋谷スクランブル交差点",
+        lat: 35.6595,
+        lng: 139.7005,
+        img: "img/shibuya.jpg",
+        desc: "無数の光と人の流れが混ざり合う、東京らしさ全開の夜景。上から見下ろすと光の川のように見える。"
+      },
+      {
+        name: "お台場海浜公園",
+        lat: 35.6275,
+        lng: 139.7760,
+        img: "img/odaiba.jpg",
+        desc: "レインボーブリッジと都会の光が海に反射して美しい。静かに夜景を眺めたいときにぴったりの場所。"
+      },
+      {
+        name: "六本木ヒルズ展望台",
+        lat: 35.6605,
+        lng: 139.7292,
+        img: "img/roppongi.jpg",
+        desc: "東京タワーを真正面に見られる絶景スポット。高層ビル群の光が広がり、まるで星空のよう。"
+      }
+    ];
+
+    spots.forEach(s => {
+      const popupContent = `
+        <div class="popup">
+          <h3>${s.name}</h3>
+          <img src="${s.img}" alt="${s.name}">
+          <p>${s.desc}</p>
+        </div>
+      `;
+
+      L.marker([s.lat, s.lng], { icon: customIcon })
+        .addTo(map)
+        .bindPopup(popupContent);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254810372_1_2_style.css">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+        }
+
+        #map {
+            width: 75vw;
+            height: 100vh;
+        }
+    /* 右側の説明パネル */
+        #info-panel {
+            width: 25vw;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #f5f5f5;
+            border-left: 2px solid #ccc;
+            font-family: sans-serif;
+        }
+
+        #info-panel h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810372</div>
+        <div style="font-size:12px;margin-bottom:3px;">佐藤　陸<br><span style='font-size:9px;color:#999;'>サトウ　リク</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/05/29 16:38</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/PR3NWxo9pYGgZb0O" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810299_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810405_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+
+<div id="map"></div>
+
+<div id="info-panel">
+    <h2>地震リスク情報</h2>
+    <p>危険エリアをクリックしてください。</p>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+<script>
+
+const map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://tiles.openfreemap.org/styles/liberty',
+    center: [139.95483, 37.833506],
+    zoom: 5
+});
+// ===== ナビゲーションコントロールの追加 =====
+// 地図の右上にズームボタンと回転ボタンを追加
+map.addControl(new maplibregl.NavigationControl());
+
+		// ===== マーカーの追加 =====
+		// 地図上にピンを立てる
+		new maplibregl.Marker({ color: "red" })
+			.setLngLat([142.2, 40.94])  // マーカーの位置 [経度, 緯度]（東京駅）
+			.setPopup(
+				// マーカーをクリックしたときに表示されるポップアップ
+				new maplibregl.Popup()
+					.setHTML("<h3>地震多発地域</h3><p>2026/*/**~2026/*/**</p>")  // ポップアップの内容（HTML形式）
+			)
+			.addTo(map);  // 作成したマーカーを地図に追加
+		
+		new maplibregl.Marker({ color: "red" })
+			.setLngLat([138.26, 38.5,])  // マーカーの位置 [経度, 緯度]（東京駅）
+			.setPopup(
+				// マーカーをクリックしたときに表示されるポップアップ
+				new maplibregl.Popup()
+					.setHTML("<h3>大地震発生</h3><p>2026/**/**</p>")  // ポップアップの内容（HTML形式）
+			)
+			.addTo(map);  // 作成したマーカーを地図に追加
+
+        const locations = [
+            { lng: 136.691706, lat: 31.689487, name: "地震発生 ****/**/**" },
+            { lng: 141.354376, lat: 43.064172, name: "地震発生 ****/**/**" },
+            { lng: 130.401716, lat: 34.590355, name: "地震発生 ****/**/**" },
+            { lng: 140.95601378561128, lat: 35.83122279718067, name: "地震発生 ****/**/**" },
+        ];
+
+        locations.forEach(loc => {
+            new maplibregl.Marker()
+                .setLngLat([loc.lng, loc.lat])
+                .setPopup(
+                new maplibregl.Popup().setHTML(`<h3>${loc.name}</h3>`)
+                )
+                .addTo(map);
+        });
+
+
+        // 地図読み込み完了後
+        map.on('load', () => {
+
+            // ===== 1つ目の危険エリア =====
+            map.addSource('risk-area-1', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [142.8, 40.79]
+                            }
+                        }
+                    ]
+                }
+            });
+
+            map.addLayer({
+                id: 'risk-circle-1',
+                type: 'circle',
+                source: 'risk-area-1',
+
+                paint: {
+                    'circle-radius': 130,
+                    'circle-color': '#ff0000',
+                    'circle-opacity': 0.4,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#aa0000'
+                }
+            });
+
+
+            // ===== 2つ目の危険エリア =====
+            map.addSource('risk-area-2', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [138.06, 38.0]
+                            }
+                        }
+                    ]
+                }
+            });
+
+            map.addLayer({
+                id: 'risk-circle-2',
+                type: 'circle',
+                source: 'risk-area-2',
+
+                paint: {
+                    'circle-radius': 90,
+                    'circle-color': '#ff0000',
+                    'circle-opacity': 0.1,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#aa0000',
+                    'circle-stroke-opacity': 0.5
+                }
+            });
+
+        });
+        // =========================
+        // クリック時に右側へ説明表示
+        // =========================
+
+        map.on('click', 'risk-circle-1', (e) => {
+
+            const props = e.features[0].properties;
+
+            document.getElementById('info-panel').innerHTML = `
+                <h2>リスク５</h2>
+                <p>${props.description}</p>
+            `;
+        });
+
+        map.on('click', 'risk-circle-2', (e) => {
+
+            const props = e.features[0].properties;
+
+            document.getElementById('info-panel').innerHTML = `
+                <h2>リスク３</h2>
+                <p>
+                過去にあった地震<br>
+                ・<br>
+                ・<br>
+                地震に注意<br>
+                津波に注意
+                </p>
+            `;
+        });
+
+
+        // マウスカーソル変更
+        map.on('mouseenter', 'risk-circle-1', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'risk-circle-1', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+        map.on('mouseenter', 'risk-circle-2', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'risk-circle-2', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+
+
+</script>
+
+</body>
+</html>

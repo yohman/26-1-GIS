@@ -1,0 +1,24 @@
+# Large files
+*.zip
+2026_*.zip
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Large data files
+large files/
+
+# Temporary files
+*~
+*.swp
+*.swo
+~$*
+
+# Video files (can be large)
+*.mov
+
+# Old backup folders
+*_old/
+*_OLD/

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- 文字エンコーディングをUTF-8に設定（日本語などの文字化けを防ぐ） -->
+	<meta charset="utf-8">
+
+	<!-- ブラウザのタブに表示されるページタイトル -->
+	<title>My First Web Map</title>
+
+	<!-- MapLibre GLのスタイルシート（地図の見た目を定義） -->
+	<link href="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css" rel="stylesheet">
+
+	<!-- 独自のスタイルシート（地図のサイズなどをカスタマイズ） -->
+	<link rel="stylesheet" href="1254511938_1_2_style.css">
+</head>
+
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254511938</div>
+        <div style="font-size:12px;margin-bottom:3px;">小林　亜伎那<br><span style='font-size:9px;color:#999;'>コバヤシ　アキナ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/02 09:04</div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254510865_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254512085_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+	<!-- 地図を表示するための空のコンテナ（id="map"で識別） -->
+	<div id="map"></div>
+
+	<!-- MapLibre GLのJavaScriptライブラリを読み込む -->
+	<script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
+
+	<script>
+		// ===== 地図の初期化 =====
+		// 新しい地図オブジェクトを作成
+		const map = new maplibregl.Map({
+			container: 'map',  // 地図を表示する要素のID
+			style: 'https://tiles.openfreemap.org/styles/bright',  // 地図のデザイン（背景地図）
+			center: [139.7671, 35.6812],  // 初期表示の中心座標 [経度, 緯度]（東京駅）
+			zoom: 4 // 初期ズームレベル（数字が大きいほど拡大）
+		});
+
+		// ===== ナビゲーションコントロールの追加 =====
+		// 地図の右上にズームボタンと回転ボタンを追加
+		map.addControl(new maplibregl.NavigationControl());
+const locations = [
+  { lng: 139.7737, lat: 35.6982, name: "秋葉原、東京",
+  text:"日本アニメの中心",color:"pink"},
+  { lng: 138.0837, lat: 36.0486, name: "諏訪湖、長野",
+  text:"君の名は。の舞台" },
+  { lng: 139.7203, lat: 35.6854, name: "四谷須賀神社、東京新宿",
+  text:"君の名は。の舞台で作中でも特に印象的" },
+  { lng: 139.9141, lat: 37.3668, name: "大川荘、福島",
+  text:"鬼滅の刃に出てくる無限城",color:"red" },
+  { lng: 132.7863, lat: 33.8520, name: "道後温泉本館、愛媛",
+  text:"千と千尋の神隠しの舞台",color:"green" },
+  { lng: 139.0024, lat: 35.2794, name: "公時神社、神奈川",
+  text:"エヴァンゲリオンの舞台",color:"blue" },
+  { lng: 131.1587, lat: 33.2811, name: "旧豊後森機関庫,大分",
+  text:"すずめの戸締りの舞台",color:"purple" },
+  { lng: 139.0894, lat: 35.9883, name: "羊山公園、埼玉",
+  text:"あの日見た花の名前を僕達はまだ知らない。の聖地",color:"orange" },
+  { lng: 139.5199, lat: 36.3143, name: "あしかがフラワーパーク、栃木",
+  text:"鬼滅の刃の最終選抜のモデル場所。藤の花が咲いている。",color:"red"},
+];
+
+locations.forEach(loc => {
+  new maplibregl.Marker({ color: loc.color})
+    .setLngLat([loc.lng, loc.lat])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>${loc.name}</h3><p>${loc.text}</p>
+      `)
+    )
+    .addTo(map);
+});
+
+	
+
+	</script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,27 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#map {
+    width: 100%;
+    height: 100vh;
+}
+
+/* UI（ボタン） */
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+#modeToggle {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #ffcc00;
+    font-weight: bold;
+    cursor: pointer;
+}

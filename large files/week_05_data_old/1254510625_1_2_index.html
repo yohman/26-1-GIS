@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>麗澤大学周辺ラーメンマップ</title>
+	<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" />
+	<link rel="stylesheet" href="1254510625_1_3_style.css">
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254510625</div>
+        <div style="font-size:12px;margin-bottom:3px;">日下　智弥<br><span style='font-size:9px;color:#999;'>クサカ　トモヤ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/05/31 11:29</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/Xb8YaLpbzg8Xayn1" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254510534_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254510865_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+	<header>
+		<h1>麗澤大学周辺ラーメンマップ</h1>
+		<p>左の一覧から店舗をクリックして地図を探索。地図が3D表示で立体的に見えます。マーカーをクリックすると店舗情報を表示します。</p>
+	</header>
+
+	<div class="container">
+		<aside id="sidebar">
+			<section>
+				<h2>店舗一覧</h2>
+				<p style="font-size:12px;color:#666;margin:0 0 8px 0;">↓ 索引をクリックして筛りこんで</p>
+				<div id="index-tabs" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;"></div>
+				<div class="search-row">
+					<input type="search" id="search" placeholder="店舗名で検索">
+				</div>
+				<div class="search-row" style="margin-top:6px">
+					<label><input type="checkbox" id="nationwide"> 全国検索</label>
+					<label><input type="checkbox" id="google-search"> Google検索</label>
+				</div>
+				<div id="search-status" aria-live="polite" style="font-size:12px;color:#666;margin-top:6px"></div>
+				<div class="list-controls">
+					<select id="sort">
+						<option value="relevance">関連順</option>
+						<option value="distance">距離順</option>
+						<option value="rating">評価順</option>
+					</select>
+					<button id="export-csv">CSV出力</button>
+				</div>
+				<div class="data-controls">
+					<button id="load-data" type="button">ローカルJSON読み込み</button>
+					<button id="save-results" type="button">検索結果を保存</button>
+					<input type="file" id="data-file" accept="application/json,.json,text/csv,.csv">
+				</div>
+				<ul id="shop-list"></ul>
+			</section>
+			<section>
+				<h2>データソース</h2>
+				<ul>
+					<li><a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a></li>
+					<li><a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank">MapLibre GL JS</a></li>
+					<li><a href="https://maps.gsi.go.jp/" target="_blank">地理院地図</a></li>
+				</ul>
+			</section>
+		</aside>
+
+		<main id="main">
+		<div class="main-tabs">
+			<button class="main-tab-btn active" data-tab="map">🗺 地図</button>
+			<button class="main-tab-btn" data-tab="list">📋 一覧</button>
+		</div>
+		
+		<div id="map-tab" class="main-tab-content active" data-tab="map">
+			<div id="region-label">位置情報を表示</div>
+			<div class="map-style-controls">
+				<label for="map-style">表示モード:</label>
+				<select id="map-style">
+					<option value="osm">標準地図</option>
+					<option value="satellite">衛星写真</option>
+				</select>
+			</div>
+			<div id="map"></div>
+		</div>
+		
+		<div id="list-tab" class="main-tab-content" data-tab="list">
+			<div class="list-view-controls">
+				<input type="search" id="list-search" placeholder="店舗名・住所で検索..." style="flex:1;">
+				<select id="list-sort">
+					<option value="order">並び順</option>
+					<option value="name">名前順</option>
+					<option value="prefecture">都道府県順</option>
+				</select>
+				<button id="list-export" class="export-btn">CSV出力</button>
+			</div>
+			<div id="list-count" style="padding:10px;font-size:12px;color:#666;"></div>
+			<div id="shop-list-view"></div>
+		</div>
+	</div>
+
+	<footer>
+		<p>参考: OpenStreetMap / MapLibre / 国土地理院</p>
+	</footer>
+
+	<script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+	<script src="1254510625_1_4_main.js"></script>
+</body>
+</html>

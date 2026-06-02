@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>観光列車・ローカル鉄道マップ（プロトタイプ）</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        
+        /* ポップアップの見た目を整えるCSS */
+        .maplibregl-popup-content {
+            max-width: 250px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            padding: 15px;
+        }
+        .popup-title { 
+            font-weight: bold; 
+            font-size: 16px; 
+            margin-bottom: 8px; 
+            color: #333; 
+        }
+        .popup-img { 
+            width: 100%; 
+            height: auto; 
+            border-radius: 4px; 
+            margin-bottom: 8px; 
+        }
+        .popup-desc { 
+            font-size: 13px; 
+            color: #555; 
+            margin: 0; 
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:9999;">
+    <div style="background:#000;color:#fff;padding:10px 20px;margin-bottom:5px;font-family:'Courier New',monospace;font-size:11px;text-align:center;">
+        <div style="font-size:10px;color:#999;margin-bottom:3px;">1254810405</div>
+        <div style="font-size:12px;margin-bottom:3px;">柴田　尚槻<br><span style='font-size:9px;color:#999;'>シバタ　ナオキ</span></div>
+        <div style="font-size:10px;color:#ccc;">2026/06/01 22:55</div><div style="font-size:10px;margin-top:5px;"><a href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/lDK1ZRLXypyDaJ9z" target="_blank" style="color:#4CAF50;text-decoration:none;">→ PADLET POST</a></div>
+    </div>
+    <div style="display:flex;gap:5px;"><a href="1254810372_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">PREV</a><a href="../index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">HOME</a><a href="1254810413_1_1_index.html" style="background:#000;color:#fff;padding:10px 20px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;">NEXT</a></div></div>
+
+
+
+
+
+    <div id="map"></div>
+
+    <script>
+        // 1. 背景地図の設定（APIキー不要のOpenStreetMap）
+        const style = {
+            "version": 8,
+            "sources": {
+                "osm": {
+                    "type": "raster",
+                    "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                    "tileSize": 256,
+                    "attribution": "&copy; OpenStreetMap Contributors"
+                }
+            },
+            "layers": [{
+                "id": "osm",
+                "type": "raster",
+                "source": "osm"
+            }]
+        };
+
+        // 2. マップの初期化（関東周辺を中心に設定）
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: style,
+            center: [139.7670, 35.6812], // 東京駅の経度・緯度
+            zoom: 7 // ズームレベル
+        });
+
+        // 3. 表示したいデータのリスト（GeoJSON形式）
+        // ★ここを自分の好きな列車・駅のデータに書き換えるだけで完成します！
+        const geojsonData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": { "type": "Point", "coordinates": [139.0019, 35.2334] }, // 経度, 緯度
+                    "properties": {
+                        "name": "箱根登山鉄道 (箱根湯本駅)",
+                        "description": "日本有数の本格的な山岳鉄道。急勾配をスイッチバックで登る景色は圧巻です。<br><span style='color:#007cbf;'>#JoyfulTrain #History</span>",
+                        "image_url": "https://picsum.photos/seed/hakone/250/150" // ※現在はダミー画像
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": { "type": "Point", "coordinates": [140.8273, 35.7298] },
+                    "properties": {
+                        "name": "銚子電鉄 (犬吠駅)",
+                        "description": "レトロな車両とぬれ煎餅で有名なローカル線。沿線にはノスタルジックな風景が広がります。<br><span style='color:#007cbf;'>#History</span>",
+                        "image_url": "https://picsum.photos/seed/choshi/250/150" 
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": { "type": "Point", "coordinates": [139.7670, 35.6812] },
+                    "properties": {
+                        "name": "サフィール踊り子 (東京駅出発)",
+                        "description": "全車両グリーン車以上のプレミアムな観光特急。伊豆の美しい海を眺めながら優雅な旅を。<br><span style='color:#007cbf;'>#BeautifulJapan</span>",
+                        "image_url": "https://picsum.photos/seed/saphir/250/150" 
+                    }
+                }
+            ]
+        };
+
+        // 4. データをもとにピン（マーカー）とポップアップを自動作成
+        geojsonData.features.forEach(function(feature) {
+            const props = feature.properties;
+            
+            // ポップアップの中身（HTML）を作る
+            const popupHtml = `
+                <img class="popup-img" src="${props.image_url}" alt="${props.name}">
+                <div class="popup-text-container">
+                    <div class="popup-title">${props.name}</div>
+                    <p class="popup-desc">${props.description}</p>
+                </div>
+            `;
+
+            // ポップアップを設定
+            const popup = new maplibregl.Popup({ offset: 25 })
+                .setHTML(popupHtml);
+
+            // マーカー（ピン）を作成してマップに追加
+            new maplibregl.Marker({ color: "#FF5722" }) // ピンのベースカラー
+                .setLngLat(feature.geometry.coordinates)
+                .setPopup(popup)
+                .addTo(map);
+        });
+    </script>
+</body>
+</html>

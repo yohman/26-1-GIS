@@ -1,0 +1,33 @@
+/* ===== ページ全体の設定 ===== */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;       /* 横並びにする */
+    overflow: hidden;    /* スクロールバーを隠す */
+}
+
+/* ===== リストエリアの設定 ===== */
+#sidebar { 
+    width: 300px;
+    background: #ffffff; 
+    overflow-y: auto;    /* リストが長い場合はスクロール可能にする */
+    border-right: 1px solid #ccc;
+    flex-shrink: 0;      /* サイドバーの幅を固定する */
+}
+
+/* ===== 地図エリアの設定 ===== */
+#map { 
+    flex: 1;             /* 残りの横幅を全て地図にする */
+    height: 100%;        /* 親要素(body)の高さに合わせる */
+}
+
+/* ===== リスト項目のスタイル ===== */
+.loc-item { 
+    cursor: pointer; 
+    padding: 15px; 
+    border-bottom: 1px solid #ddd; 
+}
+.loc-item:hover { 
+    background: #e0e0e0; 
+}
