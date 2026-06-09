@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Cards and Group Draw</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --panel: #ffffff;
+            --ink: #111827;
+            --muted: #4b5563;
+            --line: #d1d5db;
+            --soft: #fafafa;
+            --risk-bg: #f3f4f6;
+            --risk-line: #d1d5db;
+            --eng: #0f766e;
+            --non: #6d28d9;
+            --risk: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        body.is-shuffling {
+            overflow: hidden;
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(6px);
+            border-bottom: none;
+            padding: 18px 20px 14px;
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .title-block {
+            flex: 1 1 auto;
+            align-self: center;
+        }
+
+        .title-block h1 {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .title-block p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .actions {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex: 0 0 auto;
+        }
+
+        .button {
+            appearance: none;
+            border: 2px solid #111827;
+            background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+            color: white;
+            border-radius: 0;
+            padding: 18px 28px;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            min-width: 320px;
+            min-height: 80px;
+            box-shadow: 0 10px 0 #d1d5db;
+            transform: translateY(0);
+            transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 0 #d1d5db;
+        }
+
+        .button:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #d1d5db;
+        }
+
+        .button:disabled {
+            opacity: 0.45;
+            cursor: default;
+            transform: none;
+            box-shadow: 0 6px 0 #d1d5db;
+        }
+
+        .button.secondary {
+            min-width: 180px;
+            min-height: 54px;
+            padding: 12px 18px;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            background: #ffffff;
+            color: #111827;
+            border-color: #d1d5db;
+            box-shadow: 0 8px 0 #e5e7eb;
+        }
+
+        .button.secondary:hover {
+            box-shadow: 0 10px 0 #e5e7eb;
+        }
+
+        .button.secondary:active {
+            box-shadow: 0 4px 0 #e5e7eb;
+        }
+
+        .summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 16px 0 4px;
+        }
+
+        .summary-chip {
+            border: none;
+            background: #f8fafc;
+            border-radius: 0;
+            padding: 7px 10px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .view {
+            padding: 18px 20px 28px;
+        }
+
+        .section-title {
+            margin: 0 0 14px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+        }
+
+        .roster-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .dept-card {
+            border: none;
+            border-radius: 0;
+            background: white;
+        }
+
+        .dept-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 4px 8px;
+            border-bottom: none;
+            background: transparent;
+        }
+
+        .dept-name {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .dept-count {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .student-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 180px));
+            justify-content: start;
+            gap: 12px;
+            padding: 0;
+        }
+
+        .student-card {
+            border: none;
+            border-left: 6px solid var(--dept-color, var(--line));
+            border-radius: 0;
+            padding: 10px 10px 10px 12px;
+            background: #fafafa;
+            min-height: 78px;
+        }
+
+        .student-card.risk {
+            background: #f4f5f7;
+            border-left-color: var(--risk);
+            color: #6b7280;
+            filter: grayscale(1);
+            opacity: 0.92;
+        }
+
+        .student-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .student-name {
+            font-size: 13px;
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+        .student-english {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .student-meta {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .tag {
+            flex: 0 0 auto;
+            border: 1px solid currentColor;
+            border-radius: 0;
+            padding: 2px 4px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            position: relative;
+        }
+
+        .tag.eng {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+        }
+
+        .tag.non {
+            background: white;
+            border-color: #111827;
+            color: #111827;
+        }
+
+        .tag.risk {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+        }
+
+        .tag.risk::after {
+            content: "";
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            top: 50%;
+            border-top: 1px solid currentColor;
+            transform: rotate(-18deg);
+            transform-origin: center;
+            pointer-events: none;
+        }
+
+        .groups-view {
+            display: none;
+            padding: 18px 20px 28px;
+        }
+
+        .groups-view.is-visible {
+            display: block;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .group-card {
+            border: none;
+            border-radius: 0;
+            background: white;
+        }
+
+        .group-band {
+            background: var(--team-color);
+            color: white;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .group-title {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+        }
+
+        .group-code {
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+        }
+
+        .group-country {
+            margin: 0;
+            padding: 10px 4px 8px;
+            font-size: 19px;
+            line-height: 1;
+            text-transform: uppercase;
+            color: var(--team-color);
+        }
+
+        .group-members {
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .member {
+            border-left: 8px solid var(--team-color);
+            border-radius: 0;
+            padding: 10px 10px 10px 12px;
+            background: white;
+        }
+
+        .member.risk {
+            background: #f4f5f7;
+            border-left-color: var(--risk);
+            color: #6b7280;
+        }
+
+        .member-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .name {
+            font-size: 14px;
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+        .english {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .dept {
+            margin-top: 4px;
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        .missed {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .badge {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 0;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 4px 6px;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .badge.eng {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+        }
+
+        .badge.non {
+            background: white;
+            border: 1px solid #111827;
+            color: #111827;
+        }
+
+        .member.risk .badge {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+        }
+
+        .badge.risk::after {
+            content: "";
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            top: 50%;
+            border-top: 1px solid rgba(255,255,255,0.95);
+            transform: rotate(-18deg);
+            transform-origin: center;
+            pointer-events: none;
+        }
+
+        .shuffle-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .shuffle-overlay.is-visible {
+            display: flex;
+        }
+
+        .shuffle-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .shuffle-line {
+            font-size: clamp(22px, 4vw, 46px);
+            line-height: 1.1;
+            font-weight: 800;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 12px;
+            max-width: 100%;
+        }
+
+        .shuffle-sub {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        body.is-shuffling .topbar,
+        body.is-shuffling .view {
+            visibility: hidden;
+        }
+
+        body.is-shuffling .shuffle-overlay {
+            visibility: visible;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px 20px 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            border-radius: 0;
+            padding: 4px 0;
+            font-size: 11px;
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .legend-label {
+            font-weight: 700;
+        }
+
+        .legend-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+        }
+
+        .legend-item.eng {
+            color: #111827;
+        }
+
+        .legend-item.non {
+            color: #111827;
+        }
+
+        .legend-item.risk {
+            color: #6b7280;
+        }
+
+        .legend-item.eng .legend-mark {
+            background: #111827;
+        }
+
+        .legend-item.non .legend-mark {
+            border: 1.5px solid #111827;
+            background: transparent;
+        }
+
+        .legend-item.risk .legend-mark {
+            position: relative;
+            border: 1px solid #9ca3af;
+            background: transparent;
+        }
+
+        .legend-item.risk .legend-mark::after {
+            content: "";
+            width: 8px;
+            height: 2px;
+            background: #9ca3af;
+            transform: rotate(-20deg);
+            position: absolute;
+        }
+
+        @media (max-width: 760px) {
+            .student-list {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+
+        header {
+            padding: 18px 20px 12px;
+            text-align: center;
+        }
+
+        header .kicker {
+            color: var(--muted);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        header h1 {
+            margin: 6px 0 6px;
+            font-size: clamp(22px, 3vw, 38px);
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        header p {
+            margin: 0 auto;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 0 20px 18px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media print {
+            body { background: white; }
+            header, footer { color: black; }
+            header p { color: #333; }
+            main { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .group-card { box-shadow: none; break-inside: avoid; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="topbar">
+            <div class="topbar-inner">
+                <div class="title-block">
+                    <h1>Student Cards and Group Draw</h1>
+                    <p>Students are shown by department first. Press create groups to shuffle the names, then reveal balanced groups.</p>
+                </div>
+                <div class="actions">
+                    <button id="create-groups" class="button" type="button">Create Groups</button>
+                    <button id="download-csv" class="button secondary" type="button" disabled>Download CSV</button>
+                </div>
+            </div>
+            <div id="summary" class="summary"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item eng"><span class="legend-mark"></span><span class="legend-label">Engineering</span></div>
+            <div class="legend-item non"><span class="legend-mark"></span><span class="legend-label">Non-engineering</span></div>
+            <div class="legend-item risk"><span class="legend-mark"></span><span class="legend-label">5+ absences</span></div>
+        </div>
+
+        <section id="roster-view" class="view">
+            <h2 class="section-title">Students by Department</h2>
+            <div id="roster-grid" class="roster-grid"></div>
+        </section>
+
+        <section id="groups-view" class="groups-view">
+            <h2 class="section-title">Groups</h2>
+            <div id="groups-grid" class="groups-grid"></div>
+        </section>
+    </div>
+
+    <div id="shuffle-overlay" class="shuffle-overlay" aria-hidden="true">
+        <div class="shuffle-label">Creating groups</div>
+        <div id="shuffle-line" class="shuffle-line">Shuffling names...</div>
+        <div class="shuffle-sub">Rapid fire draw in progress</div>
+    </div>
+
+    <script>
+        const STUDENTS = [{"id": "1234510041", "name": "朝倉　響", "kana": "アサクラ　キョウ", "english": "ASAKURA KYOU", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 5, "is_engineer": false, "failing_risk": true}, {"id": "1234510661", "name": "田渕　竜汰", "kana": "タブチ　リュウタ", "english": "TABUCHI RYUTA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 5, "is_engineer": false, "failing_risk": true}, {"id": "1234570409", "name": "間中　大雅", "kana": "マナカ　タイガ", "english": "MANAKA TAIGA", "department": "麗澤大学 経済学部 経営学科 AI・ビジネス", "department_label": "Economics", "missed": 4, "is_engineer": false, "failing_risk": false}, {"id": "1234570475", "name": "吉田　佑聖", "kana": "ヨシダ　ユウセイ", "english": "YOSHIDA YUSEI", "department": "麗澤大学 経済学部 経営学科 AI・ビジネス", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1234620105", "name": "佐々木　塔子", "kana": "ササキ　トウコ", "english": "SASAKI TOKO", "department": "麗澤大学 国際学部 国際学科 国際交流国際協力", "department_label": "International Studies", "missed": 6, "is_engineer": false, "failing_risk": true}, {"id": "1254510013", "name": "合田　海太", "kana": "アイダ　ウミタ", "english": "AIDA UMITA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 6, "is_engineer": false, "failing_risk": true}, {"id": "1254510154", "name": "石原　優聖", "kana": "イシハラ　ユウセイ", "english": "ISHIHARA YUUSEI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1254510229", "name": "岩田　知機", "kana": "イワタ　チキ", "english": "IWATA CHIKI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 0, "is_engineer": false, "failing_risk": false}, {"id": "1254510287", "name": "江口　健太", "kana": "エグチ　ケンタ", "english": "EGUCHI KENTA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 2, "is_engineer": false, "failing_risk": false}, {"id": "1254510336", "name": "大熊　悠也", "kana": "オオクマ　ユウヤ", "english": "OKUMA YUYA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254510435", "name": "岡野　俊介", "kana": "オカノ　シュンスケ", "english": "OKANO SYUNSUKE", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 0, "is_engineer": false, "failing_risk": false}, {"id": "1254510534", "name": "川合　悠", "kana": "カワイ　ユウ", "english": "KAWAI YU", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254510625", "name": "日下　智弥", "kana": "クサカ　トモヤ", "english": "KUSAKA TOMOYA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254510724", "name": "齋藤　海翔", "kana": "サイトウ　カイト", "english": "SAITO KAITO", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 2, "is_engineer": false, "failing_risk": false}, {"id": "1254510865", "name": "佐藤　太陽", "kana": "サトウ　タイヨウ", "english": "SATO TAIYO", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254510972", "name": "鈴木　海心", "kana": "スズキ　カイシン", "english": "SUZUKI KAISHINN", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 5, "is_engineer": false, "failing_risk": true}, {"id": "1254511011", "name": "須藤　風太", "kana": "スドウ　フウタ", "english": "SUDOU FUTA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 2, "is_engineer": false, "failing_risk": false}, {"id": "1254511136", "name": "滝澤　恵豪", "kana": "タキザワ　ケイゴ", "english": "TAKIZAWA KEIGO", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 2, "is_engineer": false, "failing_risk": false}, {"id": "1254511160", "name": "舘　竜馬", "kana": "タチ　リュウマ", "english": "TACHI RYUMA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1254511251", "name": "土屋　響輝", "kana": "ツチヤ　ヒビキ", "english": "TSUCHIYA HIBIKI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254511269", "name": "土屋　勇月", "kana": "ツチヤ　ユウキ", "english": "TSUCHIYA YUKI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 0, "is_engineer": false, "failing_risk": false}, {"id": "1254511524", "name": "平山　琴愛", "kana": "ヒラヤマ　コトネ", "english": "HIRAYAMA KOTONE", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254511590", "name": "古橋　怜大", "kana": "フルハシ　レオ", "english": "FURUHASHI REO", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 6, "is_engineer": false, "failing_risk": true}, {"id": "1254511607", "name": "細谷　悠人", "kana": "ホソヤ　ユウト", "english": "HOSOYA YUUTO", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 5, "is_engineer": false, "failing_risk": true}, {"id": "1254511681", "name": "路川　朔哉", "kana": "ミチカワ　サクヤ", "english": "MICHIKAWA SAKUYA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254511805", "name": "吉澤　一生", "kana": "ヨシザワ　カズイ", "english": "YOSHIZAWA KAZUI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1254511855", "name": "渡辺　琉生", "kana": "ワタナベ　リュウセイ", "english": "WATANABE RYUSEI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1254511912", "name": "金澤　一華", "kana": "カナザワ　イチカ", "english": "KANAZAWA ICHIKA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254511938", "name": "小林　亜伎那", "kana": "コバヤシ　アキナ", "english": "KOBAYASHI AKINA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254512085", "name": "宮城　大空", "kana": "ミヤギ　ソラ", "english": "MIYAGI SORA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254512134", "name": "荒井　聡", "kana": "アライ　アキラ", "english": "ARAI AKIRA", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254512168", "name": "小松　ラファエル魁", "kana": "コマツ　ラファエルカイ", "english": "KOMATU RAFAERUKAI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 3, "is_engineer": false, "failing_risk": false}, {"id": "1254512209", "name": "山越　大地", "kana": "ヤマコシ　ダイチ", "english": "YAMAKOSHI DAICHI", "department": "麗澤大学 経済学部 経済学科 経済", "department_label": "Economics", "missed": 6, "is_engineer": false, "failing_risk": true}, {"id": "1254690352", "name": "ＪＥＯＮ　ＹＵＢＥＥＮ", "kana": "チョン　ユビン", "english": "JEON YUBEEN", "department": "麗澤大学 国際学部 国際学科 国際交流国際協力", "department_label": "International Studies", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254690435", "name": "ＰＥＲＥＲＡ　ＭＥＶＥＮＳＴＥＥＶＥ", "kana": "ペレラ　メブンスティーブ", "english": "PERERA MEVEN STEEVE", "department": "麗澤大学 国際学部 国際学科 国際社会", "department_label": "International Studies", "missed": 1, "is_engineer": false, "failing_risk": false}, {"id": "1254710209", "name": "尾崎　結衣", "kana": "オザキ　ユイ", "english": "OZAKI YUI", "department": "麗澤大学 経営学部 経営学科 ビジネスデザイン", "department_label": "Business", "missed": 4, "is_engineer": false, "failing_risk": false}, {"id": "1254730190", "name": "高嶋　諒", "kana": "タカシマ　リョウ", "english": "TAKASHIMA RYO", "department": "麗澤大学 経営学部 経営学科 AIビジネス", "department_label": "Business", "missed": 2, "is_engineer": false, "failing_risk": false}, {"id": "1254810059", "name": "粟野　翔", "kana": "アワノ　カケル", "english": "AWANO KAKERU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810075", "name": "石引　響", "kana": "イシビキ　ヒビキ", "english": "ISHIBIKI HIBIKI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810124", "name": "江口　歩真", "kana": "エグチ　アユマ", "english": "EGUCHI AYUMA", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810140", "name": "太田　和毅", "kana": "オオタ　カズキ", "english": "OTA KAZUKI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810166", "name": "小川　史温", "kana": "オガワ　シオン", "english": "OGAWA SHION", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 4, "is_engineer": true, "failing_risk": false}, {"id": "1254810174", "name": "鬼塚　駿", "kana": "オニツカ　シュン", "english": "ONITSUKA SHUN", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810182", "name": "柿木　奏太", "kana": "カキノキ　ソウタ", "english": "KAKINOKI SOUTA", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810299", "name": "桑久保　陽平", "kana": "クワクボ　ヨウヘイ", "english": "KUWAKUBO YOUHEI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810330", "name": "駒倉　康碩", "kana": "コマクラ　ヤスヒロ", "english": "KOMAKURA YASUHIRO", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810372", "name": "佐藤　陸", "kana": "サトウ　リク", "english": "SATO RIKU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810405", "name": "柴田　尚槻", "kana": "シバタ　ナオキ", "english": "SHIBATA NAOKI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810413", "name": "島田　晟", "kana": "シマダ　ジョウ", "english": "SHIMADA JOU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810512", "name": "竹田　圭冴", "kana": "タケタ　ケイゴ", "english": "TAKETA KEIGO", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810562", "name": "永野　虎太郎", "kana": "ナガノ　コタロウ", "english": "NAGANO KOTAROU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810588", "name": "野村　隆介", "kana": "ノムラ　リュウスケ", "english": "NOMURA RYUUSUKE", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 3, "is_engineer": true, "failing_risk": false}, {"id": "1254810736", "name": "三浦　和道", "kana": "ミウラ　カズミチ", "english": "MIURA KAZUMICHI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810794", "name": "桃井　優", "kana": "モモイ　ユウ", "english": "MOMOI YU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810801", "name": "森本　颯太", "kana": "モリモト　ソウタ", "english": "MORIMOTO SOUTA", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810827", "name": "八重樫　旺樹", "kana": "ヤエガシ　ヒロキ", "english": "YAEGASHI HIROKI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 2, "is_engineer": true, "failing_risk": false}, {"id": "1254810926", "name": "吉田　爽二", "kana": "ヨシダ　ソウジ", "english": "YOSHIDA SOJI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254810942", "name": "渡邉　奏士", "kana": "ワタナベ　カナト", "english": "WATNBE KANATO", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 2, "is_engineer": true, "failing_risk": false}, {"id": "1254810976", "name": "坂本　快", "kana": "サカモト　カイ", "english": "SAKAMOTO KAI", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 0, "is_engineer": true, "failing_risk": false}, {"id": "1254810992", "name": "ＭＯＮＴＥＬＬＡ　ＥＤＷＩＮ", "kana": "モンテッラ　エドウィン", "english": "MONTELLA EDWIN", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 1, "is_engineer": true, "failing_risk": false}, {"id": "1254811049", "name": "田柳　光将", "kana": "タヤナギ　ミショウ", "english": "TAYANAGI MISHOU", "department": "麗澤大学 工学部 工学科 情報システム工学", "department_label": "Engineering", "missed": 2, "is_engineer": true, "failing_risk": false}, {"id": "1254820222", "name": "神戸　宗一郎", "kana": "カンベ　ソウイチロウ", "english": "KANBE SOUICHIROU", "department": "麗澤大学 工学部 工学科 ロボティクス", "department_label": "Engineering / Robotics", "missed": 2, "is_engineer": true, "failing_risk": false}];
+        const COUNTRIES = [["Japan", "JPN", "#D00027"], ["Brazil", "BRA", "#009B3A"], ["France", "FRA", "#0055A4"], ["Argentina", "ARG", "#5DADEC"], ["Spain", "ESP", "#C60B1E"], ["Germany", "GER", "#1F1F1F"], ["Italy", "ITA", "#008C45"], ["Portugal", "POR", "#006600"], ["Netherlands", "NED", "#FF6F00"], ["England", "ENG", "#B31942"], ["Mexico", "MEX", "#006847"], ["Korea", "KOR", "#0047A0"], ["Morocco", "MAR", "#C1272D"], ["Croatia", "CRO", "#171796"], ["USA", "USA", "#3C3B6E"], ["Australia", "AUS", "#0057B8"], ["Senegal", "SEN", "#00853F"], ["Uruguay", "URU", "#0038A8"], ["Ghana", "GHA", "#FCD116"], ["Canada", "CAN", "#D52B1E"], ["Colombia", "COL", "#FCD116"]];
+        const GROUP_SIZE = 4;
+
+        const DEPT_COLORS = {
+            "Engineering": "#0f766e",
+            "Engineering / Robotics": "#0f766e",
+            "Economics": "#6d28d9",
+            "Business": "#b45309",
+            "Foreign Languages": "#0369a1",
+            "International Studies": "#be185d",
+            "Other": "#475569"
+        };
+
+        const DEPT_ORDER = [
+            "Engineering",
+            "Engineering / Robotics",
+            "Economics",
+            "Business",
+            "Foreign Languages",
+            "International Studies",
+            "Other"
+        ];
+
+        const rosterGrid = document.getElementById("roster-grid");
+        const groupsGrid = document.getElementById("groups-grid");
+        const summary = document.getElementById("summary");
+        const createButton = document.getElementById("create-groups");
+        const downloadButton = document.getElementById("download-csv");
+        const rosterView = document.getElementById("roster-view");
+        const groupsView = document.getElementById("groups-view");
+        const overlay = document.getElementById("shuffle-overlay");
+        const shuffleLine = document.getElementById("shuffle-line");
+        let lastGroups = null;
+
+        function shuffle(array) {
+            const copy = array.slice();
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function colorForDept(label) {
+            return DEPT_COLORS[label] || DEPT_COLORS.Other;
+        }
+
+        function deptBuckets(students) {
+            const buckets = new Map();
+            for (const student of students) {
+                const label = student.department_label || "Other";
+                if (!buckets.has(label)) {
+                    buckets.set(label, []);
+                }
+                buckets.get(label).push(student);
+            }
+            return buckets;
+        }
+
+        function renderSummary() {
+            const engineers = STUDENTS.filter((s) => s.is_engineer).length;
+            const nonEngineers = STUDENTS.filter((s) => !s.is_engineer).length;
+            const risk = STUDENTS.filter((s) => s.failing_risk).length;
+            summary.innerHTML = [
+                `<div class="summary-chip">Students: ${STUDENTS.length}</div>`,
+                `<div class="summary-chip">Engineers: ${engineers}</div>`,
+                `<div class="summary-chip">Non-engineers: ${nonEngineers}</div>`,
+                `<div class="summary-chip">5+ absences: ${risk}</div>`
+            ].join("");
+        }
+
+        function renderRoster() {
+            const buckets = deptBuckets(STUDENTS);
+            const ordered = Array.from(buckets.keys()).sort((a, b) => {
+                const ia = DEPT_ORDER.indexOf(a);
+                const ib = DEPT_ORDER.indexOf(b);
+                if (ia === -1 && ib === -1) return a.localeCompare(b);
+                if (ia === -1) return 1;
+                if (ib === -1) return -1;
+                return ia - ib;
+            });
+
+            rosterGrid.innerHTML = ordered.map((dept) => {
+                const students = buckets.get(dept).slice().sort((a, b) => {
+                    if (a.failing_risk !== b.failing_risk) return Number(a.failing_risk) - Number(b.failing_risk);
+                    return (a.english || a.name).localeCompare(b.english || b.name);
+                });
+
+                return `
+                    <article class="dept-card" style="--dept-color: ${colorForDept(dept)}">
+                        <div class="dept-head">
+                            <h3 class="dept-name">${dept}</h3>
+                            <div class="dept-count">${students.length} students</div>
+                        </div>
+                        <div class="student-list">
+                            ${students.map((s) => `
+                            <div class="student-card${s.failing_risk ? " risk" : ""}">
+                                <div class="student-top">
+                                    <div class="student-name">${escapeHtml(s.name)}</div>
+                                    <div class="tag ${s.is_engineer ? "eng" : "non"}${s.failing_risk ? " risk" : ""}">${s.is_engineer ? "ENG" : "NON"}</div>
+                                </div>
+                                <div class="student-english">${escapeHtml(s.english)}</div>
+                                <div class="student-meta">
+                                    <span>Missed: ${s.missed}</span>
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </article>
+                `;
+            }).join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        function randomByMissed(items) {
+            return items
+                .map((item) => ({ item, noise: Math.random() }))
+                .sort((a, b) => (a.item.missed - b.item.missed) || (a.noise - b.noise))
+                .map((entry) => entry.item);
+        }
+
+        function makeGroups(students, groupSize) {
+            const active = students.filter((s) => !s.failing_risk);
+            const failing = students.filter((s) => s.failing_risk);
+            const engineers = active.filter((s) => s.is_engineer);
+            const nonEngineers = active.filter((s) => !s.is_engineer);
+
+            if (!engineers.length) {
+                throw new Error("No active engineers found.");
+            }
+            if (!nonEngineers.length) {
+                throw new Error("No active non-engineers found.");
+            }
+
+            const desiredGroups = Math.max(1, Math.ceil(active.length / groupSize));
+            const minGroupsForEngineers = Math.ceil(engineers.length / 2);
+            const numGroups = Math.min(
+                Math.max(desiredGroups, minGroupsForEngineers),
+                engineers.length,
+                nonEngineers.length
+            );
+
+            if (numGroups < minGroupsForEngineers) {
+                throw new Error("Not enough groups available to keep engineers at two per group or fewer.");
+            }
+
+            const groups = Array.from({ length: numGroups }, () => ({ members: [], engineerCount: 0 }));
+            const engineersSorted = randomByMissed(engineers);
+
+            engineersSorted.slice(0, numGroups).forEach((student, index) => {
+                groups[index].members.push(student);
+                groups[index].engineerCount = 1;
+            });
+
+            const remainingEngineers = shuffle(engineersSorted.slice(numGroups));
+            remainingEngineers.forEach((student) => {
+                const candidates = groups
+                    .map((group, index) => ({ group, index }))
+                    .filter((entry) => entry.group.engineerCount < 2);
+
+                if (!candidates.length) {
+                    throw new Error("Could not spread engineers to no more than two per group.");
+                }
+
+                candidates.sort((a, b) => (
+                    a.group.engineerCount - b.group.engineerCount ||
+                    a.group.members.length - b.group.members.length ||
+                    Math.random() - 0.5
+                ));
+
+                candidates[0].group.members.push(student);
+                candidates[0].group.engineerCount += 1;
+            });
+
+            const nonEngineerPool = shuffle(nonEngineers);
+            for (let i = 0; i < groups.length; i++) {
+                groups[i].members.push(nonEngineerPool.pop());
+            }
+
+            shuffle(nonEngineerPool).forEach((student) => {
+                const candidates = groups.filter((group) => group.members.length < groupSize);
+                const targetPool = candidates.length ? candidates : groups;
+                targetPool.sort((a, b) => (
+                    a.members.length - b.members.length ||
+                    a.members.filter((member) => member.is_engineer).length - b.members.filter((member) => member.is_engineer).length ||
+                    Math.random() - 0.5
+                ));
+                targetPool[0].members.push(student);
+            });
+
+            const threeMemberGroups = groups.filter((group) => (
+                group.members.filter((member) => !member.failing_risk).length === 3
+            ));
+            shuffle(threeMemberGroups);
+            const failingPool = shuffle(failing);
+
+            threeMemberGroups.forEach((group) => {
+                for (let i = 0; i < 2 && failingPool.length > 0; i++) {
+                    group.members.push(failingPool.shift());
+                }
+            });
+
+            failingPool.forEach((student) => {
+                groups.sort((a, b) => (
+                    a.members.length - b.members.length ||
+                    a.members.filter((member) => member.failing_risk).length - b.members.filter((member) => member.failing_risk).length ||
+                    Math.random() - 0.5
+                ));
+                groups[0].members.push(student);
+            });
+
+            const countries = shuffle(COUNTRIES).slice();
+            return groups.map((group, index) => {
+                const country = countries[index % countries.length];
+                const activeMembers = group.members.filter((member) => !member.failing_risk);
+                const failingMembers = group.members.filter((member) => member.failing_risk);
+                return {
+                    groupNumber: index + 1,
+                    country: country[0],
+                    code: country[1],
+                    color: country[2],
+                    members: shuffle(activeMembers).concat(shuffle(failingMembers))
+                };
+            });
+        }
+
+        function renderGroups(groups) {
+            groupsGrid.innerHTML = groups.map((group) => `
+                <article class="group-card" style="--team-color: ${group.color}">
+                    <div class="group-band">
+                        <div class="group-title">GROUP ${String(group.groupNumber).padStart(2, "0")}</div>
+                        <div class="group-code">${group.code}</div>
+                    </div>
+                    <h3 class="group-country">${group.country}</h3>
+                    <div class="group-members">
+                        ${group.members.map((student) => `
+                            <div class="member${student.failing_risk ? " risk" : ""}">
+                                <div class="member-top">
+                                    <div class="name">${escapeHtml(student.name)}</div>
+                                    <div class="badge ${student.is_engineer ? "eng" : "non"}${student.failing_risk ? " risk" : ""}">${student.is_engineer ? "ENG" : "NON"}</div>
+                                </div>
+                                <div class="english">${escapeHtml(student.english)}</div>
+                                <div class="dept">${escapeHtml(student.department_label)}</div>
+                                <div class="missed">Missed: ${student.missed}</div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        function csvCell(value) {
+            const text = String(value ?? "");
+            if (/[",\n\r]/.test(text)) {
+                return `"${text.replaceAll('"', '""')}"`;
+            }
+            return text;
+        }
+
+        function buildCsv(groups) {
+            const header = [
+                "Group",
+                "Country",
+                "Country Code",
+                "学籍番号",
+                "Name",
+                "Kana Name",
+                "English Name",
+                "Department",
+                "Classes Missed",
+                "Affiliation",
+                "Failing Risk"
+            ];
+
+            const rows = [header.join(",")];
+            groups.forEach((group) => {
+                group.members.forEach((student) => {
+                    rows.push([
+                        group.groupNumber,
+                        group.country,
+                        group.code,
+                        student.id,
+                        student.name,
+                        student.kana,
+                        student.english,
+                        student.department,
+                        student.missed,
+                        student.is_engineer ? "Engineer" : "Non-engineer",
+                        student.failing_risk ? "Yes" : "No"
+                    ].map(csvCell).join(","));
+                });
+            });
+            return rows.join("\r\n");
+        }
+
+        function downloadCsv(groups) {
+            const csv = buildCsv(groups);
+            const blob = new Blob([String.fromCharCode(0xfeff), csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "groups_output.csv";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        async function createGroups() {
+            createButton.disabled = true;
+            document.body.classList.add("is-shuffling");
+            overlay.classList.add("is-visible");
+
+            const pool = STUDENTS.map((student) => student.english || student.name);
+            const lineParts = [];
+            const ticker = setInterval(() => {
+                lineParts.push(pool[Math.floor(Math.random() * pool.length)]);
+                if (lineParts.length > 6) {
+                    lineParts.shift();
+                }
+                shuffleLine.textContent = lineParts.join("   •   ");
+            }, 55);
+
+            await sleep(3200);
+            clearInterval(ticker);
+
+            lastGroups = makeGroups(STUDENTS, GROUP_SIZE);
+            renderGroups(lastGroups);
+            rosterView.style.display = "none";
+            groupsView.classList.add("is-visible");
+            downloadButton.disabled = false;
+
+            overlay.classList.remove("is-visible");
+            document.body.classList.remove("is-shuffling");
+            createButton.textContent = "Groups Created";
+        }
+
+        renderSummary();
+        renderRoster();
+        createButton.addEventListener("click", createGroups);
+        downloadButton.addEventListener("click", () => {
+            if (lastGroups) {
+                downloadCsv(lastGroups);
+            }
+        });
+    </script>
+
+    <footer>
+        Generated by create_groups_worldcup.py. Use the Download CSV button to save groups_output.csv.
+    </footer>
+</body>
+
+</html>
