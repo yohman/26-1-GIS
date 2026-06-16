@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Reitaku GIS Midterm Presentations</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --panel: #ffffff;
+            --ink: #111827;
+            --muted: #4b5563;
+            --line: #d1d5db;
+            --soft: #fafafa;
+            --risk-bg: #f3f4f6;
+            --risk: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(6px);
+            padding: 18px 20px 14px;
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .title-block {
+            flex: 1 1 auto;
+            align-self: center;
+        }
+
+        .title-block h1 {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .title-block p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 16px 0 4px;
+        }
+
+        .summary-chip {
+            border: none;
+            background: #f8fafc;
+            border-radius: 0;
+            padding: 7px 10px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .view {
+            padding: 18px 20px 28px;
+        }
+
+        .section-title {
+            margin: 0 0 14px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .group-card {
+            border: none;
+            border-radius: 0;
+            background: white;
+        }
+
+        .group-band {
+            background: var(--team-color);
+            color: white;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .group-title {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+        }
+
+        .group-code {
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+        }
+
+        .group-members {
+            padding: 0;
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .member {
+            border-left: 8px solid var(--team-color);
+            border: 1px solid #e5e7eb;
+            border-radius: 0;
+            padding: 10px 10px 10px 12px;
+            background: white;
+        }
+
+        .member.risk {
+            background: #f4f5f7;
+            border-left-color: var(--risk);
+            border-color: #d1d5db;
+            color: #6b7280;
+        }
+
+        .member.untitled {
+            background: #f8fafc;
+            border-left-color: #e2e8f0;
+            border-color: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .member-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .name {
+            font-size: 14px;
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+        .kana {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .project-title {
+            margin-bottom: 8px;
+            font-size: 20px;
+            line-height: 1.25;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--team-color);
+            min-height: 36px;
+        }
+
+        .member.untitled .project-title {
+            color: #94a3b8;
+        }
+
+        .badge {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 0;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 4px 6px;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .badge.eng {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+            opacity: 0.2;
+        }
+
+        .badge.non {
+            background: white;
+            border: 1px solid #111827;
+            color: #111827;
+            opacity: 0.2;
+        }
+
+        .member.risk .badge {
+            background: #111827;
+            border-color: #111827;
+            color: white;
+        }
+
+        .badge.risk::after {
+            content: "";
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            top: 50%;
+            border-top: 1px solid rgba(255,255,255,0.95);
+            transform: rotate(-18deg);
+            transform-origin: center;
+            pointer-events: none;
+        }
+
+        .project-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            padding: 7px 10px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid #111827;
+            color: #111827;
+            background: white;
+        }
+
+        .project-link.padlet {
+            background: #111827;
+            color: white;
+            border-color: #111827;
+        }
+
+        .project-link.github {
+            background: white;
+            color: #111827;
+        }
+
+        .project-link.repo,
+        .project-link.other {
+            background: #f8fafc;
+            color: #111827;
+            border-color: #d1d5db;
+        }
+
+        .project-links.empty {
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 0 20px 18px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 760px) {
+            .groups-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="topbar">
+            <div class="topbar-inner">
+                <div class="title-block">
+                    <h1>2026 Reitaku GIS Midterm Presentations</h1>
+                </div>
+            </div>
+            <div class="summary">
+                <div class="summary-chip">Groups: 14</div>
+                <div class="summary-chip">Students: 62</div>
+                <div class="summary-chip">With links: 31</div>
+                <div class="summary-chip">Padlet: 30</div>
+                <div class="summary-chip">GitHub Pages: 25</div>
+                <div class="summary-chip">Extras: 11</div>
+            </div>
+        </div>
+
+        <section class="view">
+            <h2 class="section-title">Final Groups</h2>
+            <div class="groups-grid">
+                
+            <article class="group-card" style="--team-color: #D00027">
+                <div class="group-band">
+                    <div class="group-title">GROUP 01</div>
+                    <div class="group-code">JPN</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">GitHub - edwin379/train · GitHub</div>
+            <div class="member-top">
+                <div class="name">MONTELLA EDWIN</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">モンテッラ エドウィン</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/Ae2Ravoe2PpOQnz4" target="_blank" rel="noopener">Padlet</a><a class="project-link repo" href="https://github.com/edwin379/train" target="_blank" rel="noopener">GitHub Repo</a><a class="project-link other" href="https://train-5dwy.onrender.com/" target="_blank" rel="noopener">train-5dwy.onrender.com</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">Interactive Earth with GIS Polygons</div>
+            <div class="member-top">
+                <div class="name">粟野 翔</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">アワノ カケル</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/kxodWG2jDgRMZgP7" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://awano-kakeru.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">音楽誕生マップ JAPAN</div>
+            <div class="member-top">
+                <div class="name">金澤 一華</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">カナザワ イチカ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/e9YpQNpzDj2lWxjM" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://a250989i-code.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">川合 悠</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">カワイ ユウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">山越 大地</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">ヤマコシ ダイチ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #FCD116">
+                <div class="group-band">
+                    <div class="group-title">GROUP 02</div>
+                    <div class="group-code">GHA</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">麗澤大学周辺ラーメンマップ</div>
+            <div class="member-top">
+                <div class="name">日下 智弥</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">クサカ トモヤ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/94PGWnoq7ML4aLRV" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://a250343t-alt.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">世界英雄・偉人マップ</div>
+            <div class="member-top">
+                <div class="name">石引 響</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">イシビキ ヒビキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/e9YpQNpzDoXDWxjM" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://a250818h-ai.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">GitHub - a250927s-create/HIPHOPMAP · GitHub</div>
+            <div class="member-top">
+                <div class="name">神戸 宗一郎</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">カンベ ソウイチロウ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/4b3zaMpVDXA9W2j7" target="_blank" rel="noopener">Padlet</a><a class="project-link repo" href="https://github.com/a250927s-create/HIPHOPMAP.git" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">土屋 勇月</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ツチヤ ユウキ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #C60B1E">
+                <div class="group-band">
+                    <div class="group-title">GROUP 03</div>
+                    <div class="group-code">ESP</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">観光列車・ローカル鉄道マップ</div>
+            <div class="member-top">
+                <div class="name">柴田 尚槻</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">シバタ ナオキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/Xb8YaLpw5XlJayn1" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://sibaba615.github.io/map1/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/sibaba615/map1" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">永野 虎太郎</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ナガノ コタロウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">舘 竜馬</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">タチ リュウマ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">間中 大雅</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">マナカ タイガ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #009B3A">
+                <div class="group-band">
+                    <div class="group-title">GROUP 04</div>
+                    <div class="group-code">BRA</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">GitHub - a250903y-gif/a250903y-gif.github.io · GitHub</div>
+            <div class="member-top">
+                <div class="name">吉田 爽二</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ヨシダ ソウジ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/mlNDZ3OGGDrqZznG" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://github.com/a250903y-gif/a250903y-gif.github.io.git" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">坂本 快</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">サカモト カイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">石原 優聖</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">イシハラ ユウセイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">荒井 聡</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">アライ アキラ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #3C3B6E">
+                <div class="group-band">
+                    <div class="group-title">GROUP 05</div>
+                    <div class="group-code">USA</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">UNESCO World Heritage Explorer</div>
+            <div class="member-top">
+                <div class="name">PERERA MEVENSTEEVE</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ペレラ メブンスティーブ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/j40PQDYqXVweZvXB" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://nejihyugamsp.github.io/UNESCO-World-Map/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">Padlet Project</div>
+            <div class="member-top">
+                <div class="name">宮城 大空</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ミヤギ ソラ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://github.com/7p6nvbdgst-dev/map01.githttps://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/zV61Q6xkVYLbWO98" target="_blank" rel="noopener">Padlet</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">Padlet Project</div>
+            <div class="member-top">
+                <div class="name">小川 史温</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">オガワ シオン</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/R7dXadN53qbeZ6bl" target="_blank" rel="noopener">Padlet</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">桃井 優</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">モモイ ユウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #0038A8">
+                <div class="group-band">
+                    <div class="group-title">GROUP 06</div>
+                    <div class="group-code">URU</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">Shibuya Livehouse Spatial Analysis Map</div>
+            <div class="member-top">
+                <div class="name">岡野 俊介</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">オカノ シュンスケ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/94PGWnoK52qoaLRV" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://osyunsuke.github.io/map-01/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/OSyunsuke/map-01" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">関東の隠れ人気スポットマップ</div>
+            <div class="member-top">
+                <div class="name">鬼塚 駿</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">オニツカ シュン</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/do3MQJwe0LnOZ15w" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://shun-onitsuka.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">須藤 風太</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">スドウ フウタ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">高嶋 諒</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">タカシマ リョウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #171796">
+                <div class="group-band">
+                    <div class="group-title">GROUP 07</div>
+                    <div class="group-code">CRO</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">高校野球強豪県ランキングマップ</div>
+            <div class="member-top">
+                <div class="name">吉田 佑聖</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ヨシダ ユウセイ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/lkDVaKVrylVdWPp9" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://a23547y-lgtm.github.io/Final-map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">Fate Globe Map</div>
+            <div class="member-top">
+                <div class="name">柿木 奏太</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">カキノキ ソウタ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/J24jalobBy6YW0A1" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://a250829s-code.github.io/earth-map/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/a250829s-code/earth-map.git" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">大熊 悠也</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">オオクマ ユウヤ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">江口 健太</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">エグチ ケンタ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #5DADEC">
+                <div class="group-band">
+                    <div class="group-title">GROUP 08</div>
+                    <div class="group-code">ARG</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">千葉県24時間営業居酒屋マップ</div>
+            <div class="member-top">
+                <div class="name">佐藤 太陽</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">サトウ タイヨウ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/BJkrQA9XKek4QEge" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://satotaiyo0503.github.io/map02/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/SatoTaiyo0503/map02" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">ZisinRisuku Web Map</div>
+            <div class="member-top">
+                <div class="name">佐藤 陸</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">サトウ リク</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/XGyBQb1x2VmgaL6K" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://sari6641.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">世界の危険度マップ</div>
+            <div class="member-top">
+                <div class="name">八重樫 旺樹</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ヤエガシ ヒロキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/LNV1Q7y77JrrWmq3" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://yaegashi0314.github.io/map001/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">平山 琴愛</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ヒラヤマ コトネ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #FF6F00">
+                <div class="group-band">
+                    <div class="group-title">GROUP 09</div>
+                    <div class="group-code">NED</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">My First Web Map</div>
+            <div class="member-top">
+                <div class="name">JEON YUBEEN</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">チョン ユビン</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/kxodWG2NvBGBZgP7" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://jyb1472.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">野球選手出身地マップ</div>
+            <div class="member-top">
+                <div class="name">島田 晟</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">シマダ ジョウ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/yEPVZkoXldopZb0Y" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://joe-0711.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/joe-0711/map01" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">⚽ STADIUM MAP</div>
+            <div class="member-top">
+                <div class="name">森本 颯太</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">モリモト ソウタ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/NvylWEjABEY3a0OX" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://souta-1213.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">吉澤 一生</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ヨシザワ カズイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #006847">
+                <div class="group-band">
+                    <div class="group-title">GROUP 10</div>
+                    <div class="group-code">MEX</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">全国有名水族館マップ(23施設・動画なし版)</div>
+            <div class="member-top">
+                <div class="name">江口 歩真</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">エグチ アユマ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/x5A7aroMvBBxQwr6" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://ayuma-wp.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">僕らの2Dと3D - Full Prototype</div>
+            <div class="member-top">
+                <div class="name">竹田 圭冴</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">タケタ ケイゴ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/L8KjW9vyykk2aJbv" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://taketaago.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/taketaago/map01" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">小松 ラファエル魁</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">コマツ ラファエルカイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">渡辺 琉生</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ワタナベ リュウセイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">田渕 竜汰</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">タブチ リュウタ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #0055A4">
+                <div class="group-band">
+                    <div class="group-title">GROUP 11</div>
+                    <div class="group-code">FRA</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">GitHub - hibiki20060716/map01 · GitHub</div>
+            <div class="member-top">
+                <div class="name">土屋 響輝</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ツチヤ ヒビキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/lkROZPpJDzrMZjMg" target="_blank" rel="noopener">Padlet</a><a class="project-link repo" href="https://github.com/hibiki20060716/map01.git" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">Popup Markers + Sidebar Toggle</div>
+            <div class="member-top">
+                <div class="name">岩田 知機</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">イワタ チキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/PR3NWxo7woyLZb0O" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://yububuyvyu.github.io/map/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">全国イオン・イオンスタイル マップ</div>
+            <div class="member-top">
+                <div class="name">桑久保 陽平</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">クワクボ ヨウヘイ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/AL83Wz7JPBnXa0Pg" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://1254810299.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">齋藤 海翔</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">サイトウ カイト</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">細谷 悠人</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">ホソヤ ユウト</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #D52B1E">
+                <div class="group-band">
+                    <div class="group-title">GROUP 12</div>
+                    <div class="group-code">CAN</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">Fantasy History Map</div>
+            <div class="member-top">
+                <div class="name">太田 和毅</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">オオタ カズキ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/NvylWEjAKwnqa0OX" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://kazu2856.github.io/fammap/" target="_blank" rel="noopener">GitHub Pages</a><a class="project-link repo" href="https://github.com/kazu2856/fammap" target="_blank" rel="noopener">GitHub Repo</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">小林 亜伎那</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">コバヤシ アキナ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">尾崎 結衣</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">オザキ ユイ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">田柳 光将</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">タヤナギ ミショウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">合田 海太</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">アイダ ウミタ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #B31942">
+                <div class="group-band">
+                    <div class="group-title">GROUP 13</div>
+                    <div class="group-code">ENG</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">東葛エリア ラーメン空間分析マップ</div>
+            <div class="member-top">
+                <div class="name">三浦 和道</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ミウラ カズミチ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/jpoxajk68LqOQbPE" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://yuu08080.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member">
+            <div class="project-title">日本全国パワースポット探索マップ</div>
+            <div class="member-top">
+                <div class="name">野村 隆介</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ノムラ リュウスケ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/mDRxWBq0x4rOZjb1" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://nomuraryuusuke.github.io/map----/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">路川 朔哉</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">ミチカワ サクヤ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">朝倉 響</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">アサクラ キョウ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">鈴木 海心</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">スズキ カイシン</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            <article class="group-card" style="--team-color: #0047A0">
+                <div class="group-band">
+                    <div class="group-title">GROUP 14</div>
+                    <div class="group-code">KOR</div>
+                </div>
+                <div class="group-members">
+                    
+        <div class="member">
+            <div class="project-title">TACTICAL MAP - MIDTERM DEMO</div>
+            <div class="member-top">
+                <div class="name">滝澤 恵豪</div>
+                <div class="badge non">NON</div>
+            </div>
+            <div class="kana">タキザワ ケイゴ</div>
+            <div class="project-links"><a class="project-link padlet" href="https://padlet.com/tsasao/26-1-reitaku-gis-acbkafzbx0kp4mu0/wish/YBl3Z2O3Ge47Wv16" target="_blank" rel="noopener">Padlet</a><a class="project-link github" href="https://keigotakky3-eng.github.io/map01/" target="_blank" rel="noopener">GitHub Pages</a></div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">渡邉 奏士</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">ワタナベ カナト</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">駒倉 康碩</div>
+                <div class="badge eng">ENG</div>
+            </div>
+            <div class="kana">コマクラ ヤスヒロ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">佐々木 塔子</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">ササキ トウコ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+        <div class="member risk untitled">
+            <div class="project-title">Untitled Project</div>
+            <div class="member-top">
+                <div class="name">古橋 怜大</div>
+                <div class="badge non risk">NON</div>
+            </div>
+            <div class="kana">フルハシ レオ</div>
+            <div class="project-links empty">No project links yet</div>
+        </div>
+    
+                </div>
+            </article>
+            
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        Generated from Final GIS Groups.csv and midterms.xlsx. Re-run generate_gallery.py after updates.
+    </footer>
+</body>
+
+</html>
