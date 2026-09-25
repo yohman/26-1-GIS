@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Yoh — GIS</title>
+  <path d="M8 12h11l10 15 10-15h11L34 36v6c0 12-7 18-21 18H8V50h5c7 0 10-3 10-9v-5Z" fill="#2b211d"/>
+  <path d="M51 4a13 10 0 1 0 0 20 13 10 0 1 0 0-20Zm0 4a8 6 0 1 1 0 12 8 6 0 1 1 0-12Z" fill="#2867b2" fill-rule="evenodd"/>
+  <circle cx="51" cy="14" r="2.5" fill="#2867b2"/>
+</svg>
